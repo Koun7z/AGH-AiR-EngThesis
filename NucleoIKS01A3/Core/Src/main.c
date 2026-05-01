@@ -133,7 +133,7 @@ int main(void)
 			last_ahrs_tick += AHRS_UPDATE_INTERVAL_MS;
 
 			printf("FC_Attitude: %0.8f, %0.8f, %0.8f, %0.8f\r\n", AHRS_Data.AttitudeEstimate.r,
-			       AHRS_Data.AttitudeEstimate.i, AHRS_Data.AttitudeEstimate.j, AHRS_Data.AttitudeEstimate.k);
+			  AHRS_Data.AttitudeEstimate.i, AHRS_Data.AttitudeEstimate.j, AHRS_Data.AttitudeEstimate.k);
 
 			// printf("$%0.2f %0.2f %0.2f;\r\n", AHRS_Data.GyroData[0], AHRS_Data.GyroData[1], AHRS_Data.GyroData[2]);
 		}
@@ -159,6 +159,7 @@ int main(void)
 	/* USER CODE BEGIN 3 */
 }
 /* USER CODE END 3 */
+
 
 /**
  * @brief System Clock Configuration
