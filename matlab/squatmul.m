@@ -3,37 +3,18 @@ function [ n ] = squatmul( q,r )
     
     [rq,cq] = size(q);
     [rr,cr] = size(r);
-    
-    if cq ~= 4
-        error('Parameter q shall be in format nx4')
-    end
-    
-    if cr ~= 4
-        error('Parameter r shall be in format nx4')
-    end
-    
-    if rq ~= 1 && rq ~= rr
-        error('Parameter r and q shall have same number of rows')
-    end
-     
-    % We need to use this instead of preallocation for symbolic math support
-    n = [];
-    
-    % Now compute
-    for i = 1:rr
-        
-        ri = r(i,:);
-        
-        if rq == 1
-            qi = q;
-        else 
-            qi = q(i,:);
-        end
 
-        n = [n;
-            (ri(1)*qi(1)-ri(2)*qi(2)-ri(3)*qi(3)-ri(4)*qi(4)) ...
-            (ri(1)*qi(2)+ri(2)*qi(1)-ri(3)*qi(4)+ri(4)*qi(3)) ...
-            (ri(1)*qi(3)+ri(2)*qi(4)+ri(3)*qi(1)-ri(4)*qi(2)) ...
-            (ri(1)*qi(4)-ri(2)*qi(3)+ri(3)*qi(2)+ri(4)*qi(1))];
+    if(rq ~= 4 || cq ~=1)
+        error("Input quaternion must be a 4 element column vector");
     end
+
+    if(rr ~= 4 || cr ~=1)
+        error("Input quaternion must be a 4 element column vector");
+    end
+    
+
+     n = [(r(1)*q(1)-r(2)*q(2)-r(3)*q(3)-r(4)*q(4));
+          (r(1)*q(2)+r(2)*q(1)-r(3)*q(4)+r(4)*q(3));
+          (r(1)*q(3)+r(2)*q(4)+r(3)*q(1)-r(4)*q(2));
+          (r(1)*q(4)-r(2)*q(3)+r(3)*q(2)+r(4)*q(1))];
 end

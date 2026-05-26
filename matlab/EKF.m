@@ -6,16 +6,16 @@ syms sigma_w_x sigma_w_y sigma_w_z
 sympref('AbbreviateOutput', true);
 
 q = [q_r; q_i; q_j; q_k];
-Sigma = diag([sigma_w_x ^ 2 sigma_w_y ^ 2 sigma_w_z ^ 2]) %[output:4f0d334c]
-omega = [omega_x; omega_y; omega_z] %[output:18fcc48b]
+Sigma = diag([sigma_w_x ^ 2 sigma_w_y ^ 2 sigma_w_z ^ 2]);
+omega = [omega_x; omega_y; omega_z] %[output:4f0d334c]
 
 % First order attitude propagation
-q_n = q + squatmul(q.', [0; omega_x; omega_y; omega_z].').' * Delta_t  / 2 %[output:2ad6ccf5]
+q_n = q + squatmul(q, [0; omega_x; omega_y; omega_z]) * Delta_t  / 2 %[output:879571bd]
 
-F = jacobian(q_n, q) %[output:57dfe092]
+F = jacobian(q_n, q) %[output:361c68fb]
 
-W = jacobian(q_n, [omega_x omega_y omega_z]) %[output:28dd91e9]
-Q = simplify(W * Sigma * W.') %[output:309bb0a9]
+W = jacobian(q_n, [omega_x omega_y omega_z]) %[output:2e020218]
+Q = simplify(W * Sigma * W.');
 %%
 syms g_x g_y g_z
 sympref('AbbreviateOutput', false);
@@ -76,22 +76,16 @@ K = PH_T / S %[output:917ab45e]
 %   data: {"layout":"inline"}
 %---
 %[output:4f0d334c]
-%   data: {"dataType":"symbolic","outputData":{"name":"Sigma","value":"\\left(\\begin{array}{ccc}\n{\\sigma_{w,x} }^2  & 0 & 0\\\\\n0 & {\\sigma_{w,y} }^2  & 0\\\\\n0 & 0 & {\\sigma_{w,z} }^2 \n\\end{array}\\right)"}}
-%---
-%[output:18fcc48b]
 %   data: {"dataType":"symbolic","outputData":{"name":"omega","value":"\\left(\\begin{array}{c}\n\\omega_x \\\\\n\\omega_y \\\\\n\\omega_z \n\\end{array}\\right)"}}
 %---
-%[output:2ad6ccf5]
+%[output:879571bd]
 %   data: {"dataType":"symbolic","outputData":{"name":"q_n","value":"\\left(\\begin{array}{c}\nq_r -\\frac{\\Delta_t \\,{\\left(\\omega_x \\,q_i +\\omega_y \\,q_j +\\omega_z \\,q_k \\right)}}{2}\\\\\nq_i +\\frac{\\Delta_t \\,{\\left(\\omega_z \\,q_j -\\omega_y \\,q_k +\\omega_x \\,q_r \\right)}}{2}\\\\\nq_j +\\frac{\\Delta_t \\,{\\left(\\omega_x \\,q_k -\\omega_z \\,q_i +\\omega_y \\,q_r \\right)}}{2}\\\\\nq_k +\\frac{\\Delta_t \\,{\\left(\\omega_y \\,q_i -\\omega_x \\,q_j +\\omega_z \\,q_r \\right)}}{2}\n\\end{array}\\right)"}}
 %---
-%[output:57dfe092]
+%[output:361c68fb]
 %   data: {"dataType":"symbolic","outputData":{"name":"F","value":"\\left(\\begin{array}{cccc}\n1 & -\\frac{\\Delta_t \\,\\omega_x }{2} & -\\frac{\\Delta_t \\,\\omega_y }{2} & -\\frac{\\Delta_t \\,\\omega_z }{2}\\\\\n\\frac{\\Delta_t \\,\\omega_x }{2} & 1 & \\frac{\\Delta_t \\,\\omega_z }{2} & -\\frac{\\Delta_t \\,\\omega_y }{2}\\\\\n\\frac{\\Delta_t \\,\\omega_y }{2} & -\\frac{\\Delta_t \\,\\omega_z }{2} & 1 & \\frac{\\Delta_t \\,\\omega_x }{2}\\\\\n\\frac{\\Delta_t \\,\\omega_z }{2} & \\frac{\\Delta_t \\,\\omega_y }{2} & -\\frac{\\Delta_t \\,\\omega_x }{2} & 1\n\\end{array}\\right)"}}
 %---
-%[output:28dd91e9]
+%[output:2e020218]
 %   data: {"dataType":"symbolic","outputData":{"name":"W","value":"\\left(\\begin{array}{ccc}\n-\\frac{\\Delta_t \\,q_i }{2} & -\\frac{\\Delta_t \\,q_j }{2} & -\\frac{\\Delta_t \\,q_k }{2}\\\\\n\\frac{\\Delta_t \\,q_r }{2} & -\\frac{\\Delta_t \\,q_k }{2} & \\frac{\\Delta_t \\,q_j }{2}\\\\\n\\frac{\\Delta_t \\,q_k }{2} & \\frac{\\Delta_t \\,q_r }{2} & -\\frac{\\Delta_t \\,q_i }{2}\\\\\n-\\frac{\\Delta_t \\,q_j }{2} & \\frac{\\Delta_t \\,q_i }{2} & \\frac{\\Delta_t \\,q_r }{2}\n\\end{array}\\right)"}}
-%---
-%[output:309bb0a9]
-%   data: {"dataType":"symbolic","outputData":{"name":"Q","value":"\\begin{array}{l}\n\\left(\\begin{array}{cccc}\n\\frac{{\\Delta_t }^2 \\,{\\left({q_i }^2 \\,{\\sigma_{w,x} }^2 +{q_j }^2 \\,{\\sigma_{w,y} }^2 +{q_k }^2 \\,{\\sigma_{w,z} }^2 \\right)}}{4} & \\sigma_4  & \\sigma_5  & \\sigma_6 \\\\\n\\sigma_4  & \\frac{{\\Delta_t }^2 \\,{\\left({q_j }^2 \\,{\\sigma_{w,z} }^2 +{q_k }^2 \\,{\\sigma_{w,y} }^2 +{q_r }^2 \\,{\\sigma_{w,x} }^2 \\right)}}{4} & \\sigma_1  & \\sigma_2 \\\\\n\\sigma_5  & \\sigma_1  & \\frac{{\\Delta_t }^2 \\,{\\left({q_i }^2 \\,{\\sigma_{w,z} }^2 +{q_k }^2 \\,{\\sigma_{w,x} }^2 +{q_r }^2 \\,{\\sigma_{w,y} }^2 \\right)}}{4} & \\sigma_3 \\\\\n\\sigma_6  & \\sigma_2  & \\sigma_3  & \\frac{{\\Delta_t }^2 \\,{\\left({q_i }^2 \\,{\\sigma_{w,y} }^2 +{q_j }^2 \\,{\\sigma_{w,x} }^2 +{q_r }^2 \\,{\\sigma_{w,z} }^2 \\right)}}{4}\n\\end{array}\\right)\\\\\n\\mathrm{}\\\\\n\\textrm{where}\\\\\n\\mathrm{}\\\\\n\\;\\;\\sigma_1 =-\\frac{{\\Delta_t }^2 \\,{\\left(-q_k \\,q_r \\,{\\sigma_{w,x} }^2 +q_k \\,q_r \\,{\\sigma_{w,y} }^2 +q_i \\,q_j \\,{\\sigma_{w,z} }^2 \\right)}}{4}\\\\\n\\mathrm{}\\\\\n\\;\\;\\sigma_2 =-\\frac{{\\Delta_t }^2 \\,{\\left(q_j \\,q_r \\,{\\sigma_{w,x} }^2 +q_i \\,q_k \\,{\\sigma_{w,y} }^2 -q_j \\,q_r \\,{\\sigma_{w,z} }^2 \\right)}}{4}\\\\\n\\mathrm{}\\\\\n\\;\\;\\sigma_3 =-\\frac{{\\Delta_t }^2 \\,{\\left(q_j \\,q_k \\,{\\sigma_{w,x} }^2 -q_i \\,q_r \\,{\\sigma_{w,y} }^2 +q_i \\,q_r \\,{\\sigma_{w,z} }^2 \\right)}}{4}\\\\\n\\mathrm{}\\\\\n\\;\\;\\sigma_4 =-\\frac{{\\Delta_t }^2 \\,{\\left(q_i \\,q_r \\,{\\sigma_{w,x} }^2 -q_j \\,q_k \\,{\\sigma_{w,y} }^2 +q_j \\,q_k \\,{\\sigma_{w,z} }^2 \\right)}}{4}\\\\\n\\mathrm{}\\\\\n\\;\\;\\sigma_5 =-\\frac{{\\Delta_t }^2 \\,{\\left(q_i \\,q_k \\,{\\sigma_{w,x} }^2 +q_j \\,q_r \\,{\\sigma_{w,y} }^2 -q_i \\,q_k \\,{\\sigma_{w,z} }^2 \\right)}}{4}\\\\\n\\mathrm{}\\\\\n\\;\\;\\sigma_6 =-\\frac{{\\Delta_t }^2 \\,{\\left(-q_i \\,q_j \\,{\\sigma_{w,x} }^2 +q_i \\,q_j \\,{\\sigma_{w,y} }^2 +q_k \\,q_r \\,{\\sigma_{w,z} }^2 \\right)}}{4}\n\\end{array}"}}
 %---
 %[output:0cf0cce8]
 %   data: {"dataType":"symbolic","outputData":{"name":"C","value":"\\left(\\begin{array}{ccc}\n{q_i }^2 -{q_j }^2 -{q_k }^2 +{q_r }^2  & 2\\,q_i \\,q_j -2\\,q_k \\,q_r  & 2\\,q_i \\,q_k +2\\,q_j \\,q_r \\\\\n2\\,q_i \\,q_j +2\\,q_k \\,q_r  & -{q_i }^2 +{q_j }^2 -{q_k }^2 +{q_r }^2  & 2\\,q_j \\,q_k -2\\,q_i \\,q_r \\\\\n2\\,q_i \\,q_k -2\\,q_j \\,q_r  & 2\\,q_j \\,q_k +2\\,q_i \\,q_r  & -{q_i }^2 -{q_j }^2 +{q_k }^2 +{q_r }^2 \n\\end{array}\\right)"}}

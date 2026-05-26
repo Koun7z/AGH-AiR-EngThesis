@@ -29,7 +29,11 @@
 #include "IMU.h"
 #include "Config.h"
 #include "Time.h"
+
 #include "DSP_AHRS_NC.h"
+#include "DSP_AHRS_EKF.h"
+#include "DSP_AHRS_Mahony.h"
+#include "DSP_AHRS_Madgwick.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,6 +43,16 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+
+typedef enum
+{
+	AHRS_FILTER_NC,
+	AHRS_FILTER_EKF,
+	AHRS_FILTER_MAHONY,
+	AHRS_FILTER_MADGWICK,
+
+	AHRS_FILTER_CNT
+} AHRS_FilterType;
 
 /* USER CODE END PTD */
 
@@ -59,7 +73,12 @@
 
 static IMU_Handle himu;
 static DSP_AHRS_NC_Instance_f32 NC_Filter;
+static DSP_AHRS_EKF_Instance_f32 EKF_Filter;
 static DSP_AHRS_DataInstance_f32 AHRS_Data;
+static DSP_AHRS_Mahony_Instance_f32 Mahony_Filter;
+static DSP_AHRS_Madgwick_Instance_f32 Madgwick_Filter;
+
+static AHRS_FilterType ActiveFilter = AHRS_FILTER_NC;
 
 /* USER CODE END PV */
 
@@ -103,6 +122,11 @@ int main(void)
 
 	/* USER CODE BEGIN SysInit */
 
+	CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+
+	DWT->CYCCNT = 0;
+	DWT->CTRL  |= DWT_CTRL_CYCCNTENA_Msk;
+
 	/* USER CODE END SysInit */
 
 	/* Initialize all configured peripherals */
@@ -116,7 +140,27 @@ int main(void)
 	IMU_CallbackSet(&himu, &OnNewAccData, &OnNewGyroData, NULL);
 
 	// TODO: Move params to Config.h
-	DSP_AHRS_NC_Init_f32(&NC_Filter, 0.1f, 0.0f, 0.9f, 0.1f, 0.2f);
+	// clang-format off
+    float gyro_noise[3 * 3] = {   // Process noise covariance
+        0.01f, 0.0f, 0.0f,
+        0.0f, 0.01f, 0.0f,
+        0.0f, 0.0f, 0.01f
+    };
+
+    float acc_noise[3 * 3] =  {   // Process noise covariance
+        0.15f, 0.0f, 0.0f,
+        0.0f, 0.15f, 0.0f,
+        0.0f, 0.0f, 0.15f
+    };
+	// clang-format on
+	DSP_AHRS_EKF_Init_f32(&EKF_Filter, gyro_noise, acc_noise, NULL);
+
+	DSP_AHRS_NC_Init_f32(&NC_Filter, 0.05, 0.0f, 0.01f, 0.1f, 0.2f);
+
+	DSP_AHRS_Mahony_Init_f32(&Mahony_Filter, 0.5f, 0.33f, 0.0f);
+
+	DSP_AHRS_Madgwick_Init_f32(&Madgwick_Filter, 0.033f, false);
+
 	DSP_AHRS_DataInit_f32(&AHRS_Data);
 	/* USER CODE END 2 */
 
@@ -126,15 +170,52 @@ int main(void)
 	{
 		IMU_Update(&himu, SYS_Tick_ms());
 
+		bool b1_pressed = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET;
+		if(b1_pressed)
+		{
+			ActiveFilter = (ActiveFilter + 1) % AHRS_FILTER_CNT;
+			printf("AHRS_Filter: %d\r\n", ActiveFilter);
+			HAL_Delay(500);
+		}
+
 		static uint32_t last_ahrs_tick = 0;
 		if(SYS_Tick_ms() - last_ahrs_tick >= AHRS_UPDATE_INTERVAL_MS)
 		{
-			DSP_AHRS_NC_FilterUpdate_f32(&NC_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+			const uint32_t updt_start_tick = DWT->CYCCNT;
+			switch(ActiveFilter)
+			{
+				case AHRS_FILTER_NC:
+				{
+					DSP_AHRS_NC_FilterUpdate_f32(&NC_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					break;
+				}
+				case AHRS_FILTER_EKF:
+				{
+					DSP_AHRS_EKF_FilterUpdate_f32(&EKF_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					break;
+				}
+				case AHRS_FILTER_MAHONY:
+				{
+					DSP_AHRS_Mahony_FilterUpdate_f32(&Mahony_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					break;
+				}
+				case AHRS_FILTER_MADGWICK:
+				{
+					DSP_AHRS_Madgwick_FilterUpdate_f32(&Madgwick_Filter, &AHRS_Data,
+					  (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					break;
+				}
+				default:
+					break;
+			}
+			const uint32_t updt_end_tick = DWT->CYCCNT;
+
 			last_ahrs_tick += AHRS_UPDATE_INTERVAL_MS;
 
 			printf("FC_Attitude: %0.8f, %0.8f, %0.8f, %0.8f\r\n", AHRS_Data.AttitudeEstimate.r,
 			  AHRS_Data.AttitudeEstimate.i, AHRS_Data.AttitudeEstimate.j, AHRS_Data.AttitudeEstimate.k);
 
+			printf("AHRS_Updt_t: %0.8f\r\n", (float)(updt_end_tick - updt_start_tick) / SystemCoreClock * 1000.0f);
 			// printf("$%0.2f %0.2f %0.2f;\r\n", AHRS_Data.GyroData[0], AHRS_Data.GyroData[1], AHRS_Data.GyroData[2]);
 		}
 

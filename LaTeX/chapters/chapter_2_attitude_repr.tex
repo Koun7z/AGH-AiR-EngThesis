@@ -1,0 +1,54 @@
+\chapter{Methods of Attitude Representation}
+
+An attitude of a body is a description of angular position of its local frame, as a relation to the global reference frame. In context of this thesis, the local reference frame can also be referred to as the body fixed frame or sensor frame, as most measurement devices mounted on the body will measure values in this frame. All mentions of attitude or rotations in this thesis assume rotations in three dimensional SO(3) group.
+
+The most commonly known method for expressing the attitude of a body is through the use of Euler angles. This method describes the attitude as a sequence of three rotations around three separate axis of reference. While this method is simple and very intuitive it is also, arguably the most problematic of all methods mentioned here. The biggest problem of Euler angles representation is the phenomenon of gimbal lock. It appears when two rotation axis become parallel, which results in the loss of one degree of freedom. This can lead to singularities in the mathematical representation, which in turn causes difficulties and discontinuities in attitude representation. On top of that, calculating rotations of vectors between two frames described with Euler angles involves the use of, computationally expensive trigonometric functions.
+Additionally, due to the fact that rotations around each axis are calculated separately, the order of rotations matters, and gives different result based on chosen convention.
+
+Most of the problems of Euler angles can be solved by using rotation matrices. A rotation matrix is a 3x3 orthogonal matrix with determinant equal to 1, which represents a rotation in three-dimensional space. This method does not suffer from gimbal lock and provides a unique way of representing rotations, at a cost of reducing intuitiveness of the representation. Rotating a vector using a rotation matrix requires only matrix multiplication. The biggest issue with rotation matrices is their memory footprint. They require 9 parameters to represent a rotation, which is more than necessary and leads to additional numeric complexity and instability. The matrixes will also accumulate numerical errors during rotation concatenation, and will require re-orthogonalization to maintain their properties.
+
+Because of that one more improvement can be made, when it comes to attitude representation, by using unit quaternions. Quaternions are a mathematical construct that extends complex numbers and can be used to represent rotations in three-dimensional space. It consists of four components: one real (scalar) part, and three imaginary parts forming a 3d vector. Quaternions bring the same improvements as rotation matrices, while also reducing the memory footprint to less then half. They also reduce the number of multiplications required for vector rotation and concatenation, which makes them a natural choice for representing rotations.
+Quaternions still suffer from the same numerical issues as rotation matrixes but maintaining the unit norm requires much less computational effort.
+
+\section{Representing Rotations as Quaternions}
+
+Quaternions are defined as a four-dimensional extension of complex numbers, consisting of one real part and three imaginary parts. A quaternion can be represented as:
+
+\begin{equation}
+	\mathbf{q} = a + b\mathbf{i} + c\mathbf{j} + d\mathbf{k}, \quad \mathbf{q} \in \mathbb{H}
+	\label{eq:qt}
+\end{equation}
+
+where $a,b,c,d$ are real numbers and $i,j,k$ are the basis vectors. The set of all quaternions is denoted by $\mathbb{H}$, for William Rowan Hamilton, who first introduced quaternions in 1843.
+% TODO: Ogarnij jak dodawać przypisy :) https://archive.org/details/s3philosophicalmag25londuoft/page/488/mode/2up
+
+Multiplication between quaternions is defined as:
+
+\begin{equation}
+	\mathbf{q}_1 \mathbf{q}_2 = \begin{pmatrix} a_1a_2 - b_1b_2 - c_1c_2 - d_1d_2 \\ a_1b_2 + b_1a_2 + c_1d_2 - d_1c_2 \\ a_1c_2 - b_1c_2 + c_1a_2 + d_1b_2 \\ a_1d_2 + b_1c_2 - c_1b_2 + d_1a_2 \end{pmatrix}
+	\label{eq:qt_mult}
+\end{equation}
+
+Quaternion conjugate is defined as:
+
+\begin{equation}
+	\mathbf{q}^* = a - b\mathbf{i} - c\mathbf{j} - d\mathbf{k}
+	\label{eq:qt_conj}
+\end{equation}
+
+For a quaternion $\mathbf{q}$ to represent a valid rotation, it must have a unit norm:
+
+\begin{equation}
+	\|\mathbf{q}\| = \sqrt{\mathbf{q}^*\mathbf{q}} = \sqrt{\mathbf{q}\mathbf{q}^*} = \sqrt{a^2 + b^2 + c^2 + d^2} = 1
+	\label{eq:qt:norm}
+\end{equation}
+
+Let a quaternion representing a rotation of frame A with respect to frame B be denoted as $^{B}_{A}\mathbf{q}$, and a vector written in frame B be denoted as ${}^{B}\mathbf{v}$, with $\mathbf{u}$ being a unit vector. Any rotation $\theta$ around a unit vector ${{}^{B}\mathbf{u}}$ can be represented as a quaternion:
+
+\begin{equation}
+	^{B}_{A}\mathbf{q} = \begin{pmatrix}\cos{\frac{\theta}{2}} \\
+		{}^{B}\mathbf{u}\sin{\frac{\theta}{2}}\end{pmatrix}
+	\label{eq:qt:rot1}
+\end{equation}
+
+

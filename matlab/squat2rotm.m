@@ -9,9 +9,8 @@ function [ rotm ] = squat2rotm(q, opts)
     end
 
     [r,c] = size(q);
-
-    if c~= 4 && r ~= 1
-        error('squat2rotm expect q in format 1x4');
+    if (r ~= 4 || c ~= 1 )
+        error("Quaternion need to be an 4 element colum vector")
     end
 
     q_r = q(1);
@@ -20,9 +19,9 @@ function [ rotm ] = squat2rotm(q, opts)
     q_k = q(4);
 
     if (opts.AssumeUnitNorm)
-        c = 1;
+        s = 1;
     else
-        c = q_r ^ 2 + q_i ^ 2 + q_j ^ 2 + q_k ^ 2;
+        s = q_r ^ 2 + q_i ^ 2 + q_j ^ 2 + q_k ^ 2; %TODO
     end
     
     if(opts.FullDiagonal)
