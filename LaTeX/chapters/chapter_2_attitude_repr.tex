@@ -1,6 +1,6 @@
 \chapter{Methods of Attitude Representation}
 
-An attitude of a body is a description of angular position of its local frame, as a relation to the global reference frame. In context of this thesis, the local reference frame can also be referred to as the body fixed frame or sensor frame, as most measurement devices mounted on the body will measure values in this frame. All mentions of attitude or rotations in this thesis assume rotations in three dimensional SO(3) group.
+An attitude of a body is a description of angular position of its body (senor) frame, as a relation to the world (Earth) reference frame.
 
 The most commonly known method for expressing the attitude of a body is through the use of Euler angles. This method describes the attitude as a sequence of three rotations around three separate axis of reference. While this method is simple and very intuitive it is also, arguably the most problematic of all methods mentioned here. The biggest problem of Euler angles representation is the phenomenon of gimbal lock. It appears when two rotation axis become parallel, which results in the loss of one degree of freedom. This can lead to singularities in the mathematical representation, which in turn causes difficulties and discontinuities in attitude representation. On top of that, calculating rotations of vectors between two frames described with Euler angles involves the use of, computationally expensive trigonometric functions.
 Additionally, due to the fact that rotations around each axis are calculated separately, the order of rotations matters, and gives different result based on chosen convention.
@@ -22,7 +22,14 @@ Quaternions are defined as a four-dimensional extension of complex numbers, cons
 where $a,b,c,d$ are real numbers and $i,j,k$ are the basis vectors. The set of all quaternions is denoted by $\mathbb{H}$, for William Rowan Hamilton, who first introduced quaternions in 1843.
 % TODO: Ogarnij jak dodawać przypisy :) https://archive.org/details/s3philosophicalmag25londuoft/page/488/mode/2up
 
-Multiplication between quaternions is defined as:
+To simplify the notation, from now on quaternions will be represented as a 4D vector, where the first component is the scalar part and the last three components are the vector part:
+
+\begin{equation}
+	\mathbf{q} = \begin{pmatrix} a \\ b \\ c \\ d \end{pmatrix}
+	\label{eq:qt_vec}
+\end{equation}
+
+Multiplication between quaternions, called a Hamilton product is defined as:
 
 \begin{equation}
 	\mathbf{q}_1 \mathbf{q}_2 = \begin{pmatrix} a_1a_2 - b_1b_2 - c_1c_2 - d_1d_2 \\ a_1b_2 + b_1a_2 + c_1d_2 - d_1c_2 \\ a_1c_2 - b_1c_2 + c_1a_2 + d_1b_2 \\ a_1d_2 + b_1c_2 - c_1b_2 + d_1a_2 \end{pmatrix}
@@ -32,7 +39,7 @@ Multiplication between quaternions is defined as:
 Quaternion conjugate is defined as:
 
 \begin{equation}
-	\mathbf{q}^* = a - b\mathbf{i} - c\mathbf{j} - d\mathbf{k}
+	\mathbf{q}^* = \begin{pmatrix} a \\ b \\ c \\ d \end{pmatrix}
 	\label{eq:qt_conj}
 \end{equation}
 
@@ -51,4 +58,8 @@ Let a quaternion representing a rotation of frame A with respect to frame B be d
 	\label{eq:qt:rot1}
 \end{equation}
 
+\section{Chosen frame of reference}
 
+The global frame of reference will be represented using NED (North-East-Down) coordinate system. The NED system is a right-handed local tangent plane coordinate system defined. The x-axis of this system points towards the north, the y-axis points towards the east and the z-axis points downwards, aligning with local gravity vector.
+
+% TODO: Figure?

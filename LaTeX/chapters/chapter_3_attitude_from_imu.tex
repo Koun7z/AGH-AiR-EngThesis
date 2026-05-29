@@ -1,0 +1,27 @@
+\chapter{Attitude from IMU Measurements}
+
+A typical MEMS IMU consists of 2 separate sensors. A rate gyroscope, measuring angular velocity along 3 sensor frame axis. As well as a 3-axis accelerometer, measuring linear acceleration along the same three axis.
+Neither one of those two sensors can be used alone to provide an reliable attitude observation in  real conditions.
+
+\section{Attitude from Accelerometer}
+
+Accelerometer readings $y_a$ can be represented as:
+
+\begin{equation}
+	\mathbf{y}_a ={}^{W}_{B}\mathbf{R} {}^W\mathbf{g} + {}^B\mathbf{a} + \mathbf{b}_a + \mathbf{w}_a
+	\label{eq:y_acc}
+\end{equation}
+
+\begin{eqwhere}[2cm]
+	\item[${}^{W}_{B}\mathbf{R}$] Rotations matrix representing transformation from world to body frame
+	\item[${}^W\mathbf{g}$] Gravity vector in word frame
+	\item[${}^B\mathbf{a}$] Local linear acceleration of the sensor
+	\item[${}\mathbf{b}_a$] Bias of the accelerometer
+	\item[${}\mathbf{w}_a$] Measurement noise of the accelerometer
+\end{eqwhere}
+
+Assuming perfectly static conditions and 0 bias term, the accelerometer measures only the gravitational acceleration vector in the sensor frame. This measurement can be used to calculate a transformation aligning the body frame to the NED frame down direction. It is important to note that this method doesn't provide full orientation of the body, only the attitude can be estimated, while the heading (yaw) remains unobservable.
+
+In most common cases, the sensor will be subject to additional, and often unpredictable external forces, which will make accelerometer only attitude estimation unreliable or even dangerous when used for control purposes.
+
+\section{Attitude from Gyroscope}

@@ -226,7 +226,7 @@
 		}
 		\vspace*{1mm}
 
-		{\sffamily\Large\itshape
+		{\sffamily\large\itshape
 			\IfStrEqCase{\ThesisLanguage}{%
 				{pl}{\@titleEN}
 				{en}{\@titlePL}
