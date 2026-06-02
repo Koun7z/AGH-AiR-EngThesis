@@ -153,13 +153,13 @@ int main(void)
         0.0f, 0.0f, 0.15f
     };
 	// clang-format on
-	DSP_AHRS_EKF_Init_f32(&EKF_Filter, gyro_noise, acc_noise, NULL);
+	DSP_AHRS_EKF_InitIMU_f32(&EKF_Filter, gyro_noise, acc_noise);
 
-	DSP_AHRS_NC_Init_f32(&NC_Filter, 0.05, 0.0f, 0.01f, 0.1f, 0.2f);
+	DSP_AHRS_NC_InitIMU_f32(&NC_Filter, 0.05, 0.01f, 0.1f, 0.2f);
 
-	DSP_AHRS_Mahony_Init_f32(&Mahony_Filter, 0.5f, 0.33f, 0.0f);
+	DSP_AHRS_Mahony_Init_f32(&Mahony_Filter, 0.5f, 0.33f);
 
-	DSP_AHRS_Madgwick_Init_f32(&Madgwick_Filter, 0.033f, false);
+	DSP_AHRS_Madgwick_Init_f32(&Madgwick_Filter, 0.033f);
 
 	DSP_AHRS_DataInit_f32(&AHRS_Data);
 	/* USER CODE END 2 */
@@ -186,23 +186,22 @@ int main(void)
 			{
 				case AHRS_FILTER_NC:
 				{
-					DSP_AHRS_NC_FilterUpdate_f32(&NC_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					DSP_AHRS_NC_UpdateIMU_f32(&NC_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
 					break;
 				}
 				case AHRS_FILTER_EKF:
 				{
-					DSP_AHRS_EKF_FilterUpdate_f32(&EKF_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					DSP_AHRS_EKF_UpdateIMU_f32(&EKF_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
 					break;
 				}
 				case AHRS_FILTER_MAHONY:
 				{
-					DSP_AHRS_Mahony_FilterUpdate_f32(&Mahony_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					DSP_AHRS_Mahony_UpdateIMU_f32(&Mahony_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
 					break;
 				}
 				case AHRS_FILTER_MADGWICK:
 				{
-					DSP_AHRS_Madgwick_FilterUpdate_f32(&Madgwick_Filter, &AHRS_Data,
-					  (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					DSP_AHRS_Madgwick_UpdateIMU_f32(&Madgwick_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
 					break;
 				}
 				default:
