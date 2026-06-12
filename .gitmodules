@@ -2,5 +2,5 @@
 	path = NucleoIKS01A3/lsm6dso-pid
 	url = git@github.com:STMicroelectronics/lsm6dso-pid.git
 [submodule "NucleoIKS01A3/DSP-lib"]
-	path = NucleoIKS01A3/DSP-lib
+	path = DSP-lib
 	url = git@github.com:Koun7z/DSP-lib.git

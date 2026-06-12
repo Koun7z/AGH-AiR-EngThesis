@@ -1,0 +1,13 @@
+\chapter{Chosen Attitude Estimation Algorithms}
+
+\section{Mahony filter}
+
+Mahony filter is a name commonly used to refer to a group of complementary filters derived by Robert Mahony in \cite{mahony-comp-so3}. The main idea behind those algorithms is to provide a computationally inexpensive solution for estimating attitude from cheap MEMS IMU sensors. Mahony expands on the idea of the classic complementary filter, by introducing a feedback term to the gyroscope measurement, which is proportional to the error between the accelerometer measurement and the expected gravity vector in the sensor frame. This feedback term helps to correct the drift in the gyroscope based estimate, while still maintaining the computational simplicity of a complementary filter.
+
+In this work, the \textit{explicit complementary filter} version of the algorithm proposed in \cite{mahony-comp-so3} will be used.
+
+\section{AQUA Complementary filter}
+
+\section{Madgwick filter}
+
+\section{Extended Kalman Filter}
