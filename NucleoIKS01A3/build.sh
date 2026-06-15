@@ -41,7 +41,7 @@ PROJECT_ROOT_DIR="$(realpath ".")"
 CMAKE_LISTS_LOCATION="${PROJECT_ROOT_DIR}/CMakeLists.txt"
 OPENOCD_CONFIG_FILE="${PROJECT_ROOT_DIR}/openocd.cfg"
 TARGET_BINARY_NAME="NucleoIKS01A3.elf"
-CONFIG_FILE="${PROJECT_ROOT_DIR}/software/Inc/Config.h"
+CONFIG_FILE="${PROJECT_ROOT_DIR}/Core/Inc/Config.h"
 
 DEFAULT_BUILD_TYPE="Debug"
 
@@ -50,7 +50,7 @@ usage() {
   echo "   -c     Remove build files (Clean)"
   echo "   -t     Build type: <Debug/Release>"
   echo "   -p     Prepare CMake files for Ninja and run CMake. Running this option multiple times will mostly reconfigure the project
-          but some cached option (e.g. used compiler) may not be changed. To clear all caches run build.sh -c first"
+                  but some cached option (e.g. used compiler) may not be changed. To clear all caches run build.sh -c first"
   echo "   -b     Build binary files"
   echo "   -f     Flash the firmware"
 }
@@ -83,7 +83,7 @@ if [[ -z "$1" ]]; then
   exit 1
 fi
 
-mkdir -p ${PROJECT_ROOT_DIR}/build
+mkdir -p "${PROJECT_ROOT_DIR}"/build
 while getopts ":ct:pbf" o; do
   case "${o}" in
   c)
@@ -108,7 +108,7 @@ while getopts ":ct:pbf" o; do
 
     fi
     
-    echo ${BUILD_TYPE} > "${PROJECT_ROOT_DIR}/build/build.cfg"
+    echo "${BUILD_TYPE}" > "${PROJECT_ROOT_DIR}/build/build.cfg"
 
     ;;
   p)
@@ -147,16 +147,16 @@ fi
 if [[ "$PREPARE" ]]; then
   if [[ ! -f ${PROJECT_ROOT_DIR}/CMakeLists.txt ]]; then
       echo "Using CMakeLists.txt from ${CMAKE_LISTS_LOCATION}"
-      ln -s ${CMAKE_LISTS_LOCATION} ${PROJECT_ROOT_DIR}/CMakeLists.txt
+      ln -s "${CMAKE_LISTS_LOCATION}" "${PROJECT_ROOT_DIR}/CMakeLists.txt"
   fi
 
   echo "Preparing CMake configuration."
-  mkdir -p ${PROJECT_ROOT_DIR}/build/${BUILD_TYPE}
+  mkdir -p "${PROJECT_ROOT_DIR}/build/${BUILD_TYPE}"
   cmake --log-level=DEBUG \
-         -S ${PROJECT_ROOT_DIR} -B ${PROJECT_ROOT_DIR}/build/${BUILD_TYPE} -G Ninja \
+         -S "${PROJECT_ROOT_DIR}" -B "${PROJECT_ROOT_DIR}/build/${BUILD_TYPE}" -G Ninja \
          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
          -DCMAKE_VERBOSE_MAKEFILE=ON \
-         -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+         -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"
 
   echo "Using compile_commands.json from ${BUILD_TYPE} build."
   ln -sf "$(realpath "${PROJECT_ROOT_DIR}/build/${BUILD_TYPE}/compile_commands.json")"  "${PROJECT_ROOT_DIR}/build/compile_commands.json"
@@ -173,8 +173,7 @@ if [[ "$BUILD" ]]; then
 
 fi
 
-
 if [[ "$FLASH" ]]; then
   log_info "Flashing STM32 firmware: ${PROJECT_ROOT_DIR}/build/${BUILD_TYPE}/${TARGET_BINARY_NAME}."
-  openocd -f ${OPENOCD_CONFIG_FILE} -c "program ${PROJECT_ROOT_DIR}/build/${BUILD_TYPE}/${TARGET_BINARY_NAME} verify reset exit"
+  openocd -f "${OPENOCD_CONFIG_FILE}" -c "program ${PROJECT_ROOT_DIR}/build/${BUILD_TYPE}/${TARGET_BINARY_NAME} verify reset exit"
 fi

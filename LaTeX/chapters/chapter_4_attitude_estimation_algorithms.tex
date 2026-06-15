@@ -2,11 +2,89 @@
 
 \section{Mahony filter}
 
-Mahony filter is a name commonly used to refer to a group of complementary filters derived by Robert Mahony in \cite{mahony-comp-so3}. The main idea behind those algorithms is to provide a computationally inexpensive solution for estimating attitude from cheap MEMS IMU sensors. Mahony expands on the idea of the classic complementary filter, by introducing a feedback term to the gyroscope measurement, which is proportional to the error between the accelerometer measurement and the expected gravity vector in the sensor frame. This feedback term helps to correct the drift in the gyroscope based estimate, while still maintaining the computational simplicity of a complementary filter.
-
+Mahony filter is a name commonly used to refer to a group of complementary filters derived by Robert Mahony in \cite{mahony-comp-so3}. The main idea behind those algorithms is to provide a computationally inexpensive solution for estimating attitude from cheap MEMS IMU sensors. Mahony expands on the idea of the classic complementary filter, by introducing a feedback term to the gyroscope measurement, which is an integral of the error between the accelerometer measurement and the expected gravity vector in the sensor frame. This feedback term helps to correct the drift in the gyroscope based estimate, while still maintaining the computational simplicity of a complementary filter.
 In this work, the \textit{explicit complementary filter} version of the algorithm proposed in \cite{mahony-comp-so3} will be used.
 
+To derive the correction term for the filter, Madgwick uses an error that is the relative rotation from body frame to the estimator frame. In practice, the real body frame rotation is unknown, so an estimated rotation derived from available measurements $R_{y}$ is used instead.
+
+\begin{equation}
+	E_{tr} = \frac{1}{2} tr(\mathbf{I}_3 - \hat{\mathbf{R}}^T\mathbf{R_y}) = 1 - \cos(\theta)
+\end{equation}
+Where $\theta$ is the angle associated with the rotation between those frames.
+The filter dynamics, in quaternion form are given by:
+\begin{equation}
+	\begin{aligned}
+		\dot{\mathbf{\hat{q}}}     & = \frac{1}{2} \mathbf{\hat{q}} \otimes \mathbf{p}(\boldsymbol{\Omega}_y - \mathbf{\hat{b}} + k_p \boldsymbol{\omega}) \\
+		\boldsymbol{\dot{\hat{b}}} & = -k_I \boldsymbol{\omega}
+	\end{aligned}
+\end{equation}
+
+The goal of the estimator will be to find a term $\boldsymbol{\omega}$ that will drive this error to 0. The correction term introduced by Madgwick is:
+\begin{equation}
+	\boldsymbol{\omega} = vex(\mathbb{P}_a(\hat{\mathbf{R}}^T\mathbf{R}_y)) = sin(\theta)\mathbf{u}
+\end{equation}
+With the normalized accelerometer measurement $v$ and the expected gravity vector $\hat{v} = \mathbf{R}(\mathbf{\hat{q}})^T\mathbf{g}$, $g = [0, 0, 1]^T$, the correction term can be expressed as:
+\begin{equation}
+	\boldsymbol{\omega} = v \times \hat{v}
+\end{equation}
+
+With the correction term defined, the full explicit complementary filter dynamics can be implemented as follows:
+\begin{equation}
+	\begin{aligned}
+		\dot{\hat{q}}   & = \frac{1}{2} \hat{q} \otimes {p}(\Omega_y - \hat{b} + k_p \omega) \\
+		{\dot{\hat{b}}} & = -k_I \omega                                                      \\
+		{\omega}        & = k_I(v \times \hat{v})
+	\end{aligned}
+\end{equation}
+
+The estimator can be parameterized by two gains, $k_p$ and $k_I$. The $k_p$ parameter controls the instantaneous   filter correction. If its to high, the filter will be very sensitive to accelerometer noise, while if its too low, the filter will be slow to correct for gyroscope drift, or even diverge all together. The $k_I$ parameter controls the integral correction term, which is responsible for estimating the gyroscope bias.
+
 \section{AQUA Complementary filter}
+
+In \cite{Valenti-AQUA} Roberto G. Valenti \textit{et. al.} describes a orientation estimation algorithm, which is an interesting variation on an standard complementary filter algorithm. The main idea behind his approach is to provide estimation as the algebraic solution of a system from inertial and optionally magnetic observations. % Napisać bardziej po swojemu?
+During the correction step, the algorithm finds the tilt quaternion from accelerometer and the heading quaternion from magnetometer observations separately. This allows to avoid the problem of magnetic distortion affecting the attitude estimation.
+
+% TODO: Uzgodnić konwencje w notacji
+%
+The dynamics of the filter prediction step, as proposed in \cite{Valenti-AQUA}, but adjusted for notation conventions are given by:
+\begin{equation}
+	\begin{aligned}
+		{}^{B}_{E}\dot{\hat{\boldsymbol{q}}}_{\omega,t_k} & = \frac{1}{2} \hat{\boldsymbol{q}}_{\omega,t_{k - 1}} \otimes \boldsymbol{p}(\boldsymbol{\Omega}_{y,t_k}) \\
+	\end{aligned}
+\end{equation}
+This equation can be computed numerically, using a simple Euler integration method:
+\begin{equation}
+	{}^{B}_{E}\hat{\boldsymbol{q}}_{\omega,t_k} = \hat{\boldsymbol{q}}_{\omega,t_{k - 1}} + \dot{\hat{\boldsymbol{q}}}_{\omega,t_k} \Delta t
+\end{equation}
+In the correction step, an delta quaternion is computed from the accelerometer observation, which is then used to correct the predicted orientation:
+\begin{equation}
+	\hat{\boldsymbol{q}}_{t_k} = {}^{E}_{W}\widehat{\Delta\boldsymbol{q}}_{acc} \otimes {}^{B}_{E}\hat{\boldsymbol{q}}_{\omega,t_k}
+\end{equation}
+The delta quaternion $\Delta \boldsymbol{q}_{acc}$satisfies the following system of equations:
+% Ogarnij to równanie, bo tu znaki się nie będą zgadzać
+\begin{equation}
+	\begin{cases}
+		2(\Delta q_{1, acc}\Delta q_{3, acc} + \Delta q_{0, acc}\Delta q_{2, acc})                & = G_x \\
+		2(\Delta q_{2, acc}\Delta q_{3, acc} + \Delta q_{0, acc}\Delta q_{1, acc})                & = G_y \\
+		\Delta q_{0, acc}^2 - \Delta q_{1, acc}^2 - \Delta q_{2, acc}^2    +  \Delta q_{3, acc}^2 & = G_z \\
+	\end{cases}
+\end{equation}
+Where $\boldsymbol{G} = \boldsymbol{R}({}^{B}_{W}\hat{\boldsymbol{q}})\boldsymbol{g} = [G_x, G_y, G_z]^T, g = [0, 0, 1]^T$, is the gravity vector predicted from the orientation estimate.
+After defining the component $\Delta q_{3, acc} = 0$ or $\Delta q_{2, acc} = 0$, the solution to this system of can be found, one for each case. Two solutions were given to avoid singularities in the solution, depending on the value of $G_z$:
+\begin{equation}
+	\Delta \boldsymbol{q}_{acc} = \begin{cases}
+		[ \sqrt{\frac{G_z + 1}{2}} \quad \frac{G_y}{2G_z + 1} \quad -\frac{G_x}{2G_z + 1} \quad 0 ]  & , G_z >= 0 \\
+		[ -\frac{G_y}{2(1-G_z)} \quad -\sqrt{\frac{1-G_z}{2}	} \quad 0 \quad -\frac{G_x}{2(1-G_z)} ] & , G_z < 0  \\
+	\end{cases}
+\end{equation}
+%
+Applying the full correction term will instantaneously rotates the predicted orientation to match the tilt observed by the accelerometer. This is undesirable, as the accelerometer measures both the gravity vector and the linear acceleration of the sensor. To avoid this, the $\Delta \boldsymbol{q}_{acc}$ is interpolated with the identity quaternion, using a gain parameter $k_{acc}$. Valenti \textit{et. al.} proposes to use LERP interpolation for relatively small corrections. The metric given for this selection is the cosine of the subtended angle $\Omega$ between interpolated quaternions. The suggested threshold over which to use \textit{LERP} is $cos(\Omega) > 0.9$, below that \textit{SLERP} should be used. When interpolating with unit quaternion, the $cos(\Omega)$ is equal to the scalar part of the $\Delta \boldsymbol{q}_{acc}$ quaternion. The final correction term becomes:
+\begin{equation}
+	{}^{E}_{W}\widehat{\Delta\boldsymbol{q}}_{acc} = \begin{cases}
+		\frac{\textit{LERP}(\boldsymbol{q}_I, \Delta \boldsymbol{q}_{acc}, k_{acc})}{||\textit{LERP}(\boldsymbol{q}_I, \Delta \boldsymbol{q}_{acc}, k_{acc})||} & , \Delta q_{0, acc} > 0.9    \\
+		\textit{SLERP}(\boldsymbol{q}_I,\Delta \boldsymbol{q}_{acc}, k_{acc})                                                                                   & , \Delta q_{0, acc} \leq 0.9 \\
+	\end{cases}
+\end{equation}
 
 \section{Madgwick filter}
 

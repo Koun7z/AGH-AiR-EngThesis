@@ -30,7 +30,7 @@
 #include "Config.h"
 #include "Time.h"
 
-#include "DSP_AHRS_NC.h"
+#include "DSP_AHRS_AQUA.h"
 #include "DSP_AHRS_EKF.h"
 #include "DSP_AHRS_Mahony.h"
 #include "DSP_AHRS_Madgwick.h"
@@ -46,7 +46,7 @@
 
 typedef enum
 {
-	AHRS_FILTER_NC,
+	AHRS_FILTER_AQUA,
 	AHRS_FILTER_EKF,
 	AHRS_FILTER_MAHONY,
 	AHRS_FILTER_MADGWICK,
@@ -72,13 +72,13 @@ typedef enum
 /* USER CODE BEGIN PV */
 
 static IMU_Handle himu;
-static DSP_AHRS_NC_Instance_f32 NC_Filter;
+static DSP_AHRS_AQUA_Instance_f32 AQUA_Filter;
 static DSP_AHRS_EKF_Instance_f32 EKF_Filter;
 static DSP_AHRS_DataInstance_f32 AHRS_Data;
 static DSP_AHRS_Mahony_Instance_f32 Mahony_Filter;
 static DSP_AHRS_Madgwick_Instance_f32 Madgwick_Filter;
 
-static AHRS_FilterType ActiveFilter = AHRS_FILTER_NC;
+static AHRS_FilterType ActiveFilter = AHRS_FILTER_AQUA;
 
 /* USER CODE END PV */
 
@@ -90,9 +90,6 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-int _write(int file, char* ptr, int len);
-
 void OnNewAccData(IMU_Handle* imu, uint32_t tick);
 void OnNewGyroData(IMU_Handle* imu, uint32_t tick);
 
@@ -155,11 +152,11 @@ int main(void)
 	// clang-format on
 	DSP_AHRS_EKF_InitIMU_f32(&EKF_Filter, gyro_noise, acc_noise);
 
-	DSP_AHRS_NC_InitIMU_f32(&NC_Filter, 0.05, 0.01f, 0.1f, 0.2f);
+	DSP_AHRS_AQUA_InitIMU_f32(&AQUA_Filter, 0.1f);
 
 	DSP_AHRS_Mahony_Init_f32(&Mahony_Filter, 0.5f, 0.33f);
 
-	DSP_AHRS_Madgwick_Init_f32(&Madgwick_Filter, 0.033f);
+	DSP_AHRS_Madgwick_InitIMU_f32(&Madgwick_Filter, 0.033f);
 
 	DSP_AHRS_DataInit_f32(&AHRS_Data);
 	/* USER CODE END 2 */
@@ -184,9 +181,9 @@ int main(void)
 			const uint32_t updt_start_tick = DWT->CYCCNT;
 			switch(ActiveFilter)
 			{
-				case AHRS_FILTER_NC:
+				case AHRS_FILTER_AQUA:
 				{
-					DSP_AHRS_NC_UpdateIMU_f32(&NC_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
+					DSP_AHRS_AQUA_UpdateIMU_f32(&AQUA_Filter, &AHRS_Data, (AHRS_UPDATE_INTERVAL_MS / 1000.0f));
 					break;
 				}
 				case AHRS_FILTER_EKF:

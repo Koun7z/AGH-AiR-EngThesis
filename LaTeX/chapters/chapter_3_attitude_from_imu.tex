@@ -1,24 +1,23 @@
 \chapter{Attitude from IMU Measurements}
 
-A typical MEMS IMU consists of 2 separate sensors. A rate gyroscope, measuring angular velocity along 3 sensor frame axis. As well as a 3-axis accelerometer, measuring linear acceleration along the same three axis.
+A typical MEMS IMU consists of 2 separate sensors. A rate gyroscope, measuring angular velocity along 3 sensor frame axis, in $rad/s$. As well as a 3-axis accelerometer, measuring linear acceleration along the same three axis, in $m/s^2$.
 Neither one of those two sensors can be used alone to provide an reliable attitude observation in  real conditions.
 
 \section{Attitude from Accelerometer}
-
-Accelerometer readings $y_a$ can be represented as:
+Measurement model for accelerometer observations $a_y$ can be represented as:
 
 \begin{equation}
-	\mathbf{y}_a ={}^{W}_{B}\mathbf{R} {}^W\mathbf{g} + {}^B\mathbf{a} + \mathbf{b}_a + \mathbf{w}_a
+	\mathbf{a}_y = {}^{W}_{B}\mathbf{R}(\boldsymbol{\dot{v}} + \mathbf{g}) + \mathbf{b}_a + \boldsymbol{\mu}_a
 	\label{eq:y_acc}
 \end{equation}
 
 Where:
 \begin{eqwhere}[3cm]
 	\item[${}^{W}_{B}\mathbf{R}$] Rotations matrix representing transformation from world to body frame
-	\item[${}^W\mathbf{g}$] Gravity vector in word frame
-	\item[${}^B\mathbf{a}$] Local linear acceleration of the sensor
+	\item[$\mathbf{g}$] Gravity vector in word frame
+	\item[$\mathbf{\dot{v}}$] Body frame acceleration
 	\item[${}\mathbf{b}_a$] Bias of the accelerometer
-	\item[${}\mathbf{w}_a$] Measurement noise, including all unmodeled dynamics of the system
+	\item[${}\boldsymbol{\mu}_a$] Measurement noise, including all unmodeled dynamics of the system
 \end{eqwhere}
 
 Assuming perfectly static conditions and 0 bias term, the accelerometer measures only the gravitational acceleration vector in the sensor frame. This measurement can be used to calculate a transformation aligning the body frame to the NED frame down direction. It is important to note that this method doesn't provide full orientation of the body, only the attitude can be estimated, while the heading (yaw) remains unobservable.
@@ -27,18 +26,18 @@ In most common cases, the sensor will be subject to additional, and often unpred
 
 \section{Attitude from Gyroscope}
 
-Gyroscope measurements $y_g$ can be represented as:
+Gyroscope measurements $\Omega_y$ can be represented as:
 
 \begin{equation}
-	\mathbf{y}_g = {}^B\boldsymbol{\omega} + \mathbf{b}_g + \mathbf{w}_g
+	\boldsymbol{\Omega}_y = {}^B\boldsymbol{\Omega} + \mathbf{b}_g + \boldsymbol{\mu}_g
 	\label{eq:y_gyro}
 \end{equation}
 
 Where:
 \begin{eqwhere}[3cm]
-	\item[${}^B\boldsymbol{\omega}$] Angular velocity vector in the sensor frame
+	\item[${}^B\boldsymbol{\Omega}$] Real angular velocity vector in the sensor frame
 	\item[${}\mathbf{b}_g$] Gyroscope bias, slowly varying over time
-	\item[${}\mathbf{w}_g$] Measurement noise, including all unmodeled dynamics of the system
+	\item[${}\boldsymbol{\mu}_g$] Measurement noise, including all unmodeled dynamics of the system
 \end{eqwhere}
 
 Assuming an initial orientation, which cannot be measured by the gyroscope, the orientation can be estimated by integrating the angular velocity over time. This method gives an full orientation estimate, which is mostly unaffected by external linear accelerations. However, due to measurement noise, numerical integration errors and most importantly, the slowly varying bias, this estimate will drift over time, making it unreliable for long term use.
