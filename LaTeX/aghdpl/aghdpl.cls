@@ -36,7 +36,8 @@
 \RequirePackage{xstring}
 
 \newcommand{\ThesisLanguage}{pl}
-\IfStrEqCase{\aghdpl@language}{%
+\IfStrEqCase{\aghdpl@language}
+{%
 	{en}{\renewcommand{\ThesisLanguage}{en}}%
 	{pl}{\renewcommand{\ThesisLanguage}{pl}}%
 }[\PackageError{aghdpl}{Invalid thesis language.}{Available languages: Polish (pl), English (en)}]
@@ -46,10 +47,18 @@
 
 % Lista wszystkich języków stanowiących języki pozycji bibliograficznych użytych w pracy.
 % (Zgodnie z zasadami tworzenia bibliografii każda pozycja powinna zostać utworzona zgodnie z zasadami języka, w którym dana publikacja została napisana.)
-\RequirePackage[english,polish]{babel}
+\IfStrEq{\ThesisLanguage}{en}
+{%
+    \RequirePackage[english,polish]{babel}
+    \selectlanguage{english}
+}
 
-% Użyj polskiego łamania wyrazów (zamiast domyślnego angielskiego).
-\RequirePackage{polski}
+\IfStrEq{\ThesisLanguage}{pl}
+{%
+    \RequirePackage[polish,english]{babel}
+    \selectlanguage{polish}
+    \RequirePackage{polski}
+}
 
 % Użyj kodowania UTF-8.
 \RequirePackage[utf8]{inputenc}
@@ -89,8 +98,8 @@
 	\geometry{
 		lmargin=30mm,  % inner on odd pages
 		rmargin=20mm,  % outer on odd pages
-		tmargin=30mm,
-		bmargin=30mm,
+		tmargin=20mm,
+		bmargin=20mm,
 		head=10mm,
 		foot=10mm
 	}
@@ -159,14 +168,17 @@
 
 %------------------------------------------------------------------------------
 \newcommand{\aghdpl@tablerowsep}{0.9ex}
-\IfStrEqCase{\ThesisLanguage}{
+\IfStrEqCase{\ThesisLanguage}
+{
 	{pl}{%
-		\def\thesisheaders{
+		\def\thesisheaders
+        {
 			\fancyfoot[LO,LE]{\small \textit{\@shorttitlePL}}
 			\fancyfoot[RO,RE]{\small \@shortauthor}
 		}
 
-		\def\thesistable{
+		\def\thesistable
+        {
 			\begingroup
 			\setlength{\extrarowheight}{\aghdpl@tablerowsep}
 			\begin{tabular}{p{45mm}l}
@@ -178,12 +190,14 @@
 		}
 	}
 	{en}{%
-		\def\thesisheaders{
+		\def\thesisheaders
+        {
 			\fancyfoot[LO,LE]{\small \textit{\@shorttitleEN}}
 			\fancyfoot[RO,RE]{\small \@shortauthor}
 		}
 
-		\def\thesistable{
+		\def\thesistable
+        {
 			\begingroup
 			\setlength{\extrarowheight}{\aghdpl@tablerowsep}
 			\begin{tabular}{p{45mm}l}
@@ -207,8 +221,14 @@
 
 		\vspace*{2mm}
 		{
-			\scalebox{0.95}{\sffamily{\large{\bfseries{\scshape Akademia Górniczo-Hutnicza im. Stanisława Staszica w Krakowie}}}}
-
+            \IfStrEq{\ThesisLanguage}{en}
+            {% t
+                \scalebox{0.95}{\sffamily{\large{\bfseries{\scshape AGH University of Kraków}}}}
+            }
+            {% f
+                \scalebox{0.95}{\sffamily{\large{\bfseries{\scshape Akademia Górniczo-Hutnicza im. Stanisława Staszica w Krakowie}}}}
+            }
+            
 			\vspace*{1mm}
 
 			{\sffamily\small\bfseries \@faculty}
@@ -345,11 +365,14 @@
 
 \RequirePackage{siunitx}
 
-\sisetup{
-	output-decimal-marker = {,},  % symbol dziesiętny
-	%	round-mode=places,
-	%	round-precision=4,
-	group-separator={~},  % separator grupy 3 cyfr
+\IfStrEq{\ThesisLanguage}{pl}
+{%
+    \sisetup{
+    	output-decimal-marker = {,},  % symbol dziesiętny
+    	%	round-mode=places,
+    	%	round-precision=4,
+    	group-separator={~},  % separator grupy 3 cyfr
+    }
 }
 
 % =============================================================================
@@ -405,15 +428,16 @@
 
 \RequirePackage{csquotes}
 % Ponieważ `csquotes` nie posiada polskiego stylu, można skorzystać z mocno zbliżonego stylu chorwackiego.
-\DeclareQuoteAlias{croatian}{polish}
+\IfStrEq{\ThesisLanguage}{pl}{% 
+    \DeclareQuoteAlias{croatian}{polish}
+}
 
 \addbibresource{bibliography.bib}
 
 % Nie wyświetlaj wybranych pól.
 %\AtEveryBibitem{\clearfield{note}}
 
-\DeclareFieldFormat*{title}{,,\textit{#1}''}
-
+\DeclareFieldFormat*{title}{''\textit{#1}''}
 
 % =============================================================================
 %    SEC:   Konfiguracja listingów
@@ -479,8 +503,15 @@
 }
 
 \AtBeginDocument{
-	\renewcommand{\tablename}{Tabela}
-	\renewcommand{\figurename}{Rys.}
+  \IfStrEq{\ThesisLanguage}{en}{
+    \renewcommand{\tablename}{Table}
+    \renewcommand{\figurename}{Fig.}
+    \renewcommand{\bibname}{Bibliography}
+  }{
+    \renewcommand{\tablename}{Tabela}
+    \renewcommand{\figurename}{Rys.}
+    \renewcommand{\bibname}{Bibliografia}
+  }
 }
 
 % =============================================================================

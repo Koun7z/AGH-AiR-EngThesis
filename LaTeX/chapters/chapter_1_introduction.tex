@@ -2,7 +2,7 @@
 
 The main goal of this thesis is to compare various attitude estimation algorithms (with a North unreferenced Yaw) using data from a 6-degree-of-freedom MEMS inertial measurement unit (6DOF IMU). The comparison will be made based on two main criteria, estimation accuracy and computation cost.
 
-The experimental evaluation will include following algorithms:
+The experimental evaluation will include the following algorithms:
 \begin{itemize}
 	\item Complementary filter
 	\item Mahony filter
@@ -10,9 +10,9 @@ The experimental evaluation will include following algorithms:
 	\item Madgwick filter
 \end{itemize}
 
-The estimation accuracy will be measured under different conditions and at different IMU sampling frequencies. This data will be interpreted using the mentioned algorithms and compared with a reference attitude measurement (obtained by a reference sensor or a motion capture system). Test scenarios will cover measurements in both static conditions (with low external interference) and dynamic conditions (with linear or centrifugal accelerations added). The tests should enable comparison of how different algorithms handle noise directly from sensors and how those filters react to external noise, introduced by the environment.
+The estimation accuracy will be measured under different conditions and at different IMU sampling frequencies. These data will be interpreted using the mentioned algorithms and compared with a reference attitude measurement (obtained by a reference sensor or a motion capture system). The test scenarios will cover measurements in both static conditions (with low external interference) and dynamic conditions (with linear or centrifugal accelerations added). The tests should enable comparison of how different algorithms handle noise directly from sensors and how those filters react to external noise introduced by the environment.
 % An optional analysis of the impact of IMU calibration on estimation accuracy may also be included.
 
-To compare the computational cost, selected algorithms will be implemented and benchmarked on an STM32 family microcontroller in the C programming language. This will enable a direct measurement of time or memory overhead introduced by the filter.
+To compare the computational cost, the selected algorithms will be implemented and benchmarked on an STM32 family microcontroller in the C programming language. This will enable a direct measurement of the time or memory overhead introduced by the filter.
 
 \section{Introduction}

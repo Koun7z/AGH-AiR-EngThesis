@@ -1,10 +1,10 @@
 \chapter{Attitude from IMU Measurements}
 
-A typical MEMS IMU consists of 2 separate sensors. A rate gyroscope, measuring angular velocity along 3 sensor frame axis, in $rad/s$. As well as a 3-axis accelerometer, measuring linear acceleration along the same three axis, in $m/s^2$.
-Neither one of those two sensors can be used alone to provide an reliable attitude observation in  real conditions.
+A typical MEMS IMU consists of 2 separate sensors. A rate gyroscope, measuring angular velocity along the 3 sensor frame axis, in $rad/s$. As well as a 3-axis accelerometer, measuring linear acceleration along the same three axes, in $m/s^2$.
+Neither of those two sensors can be used alone to provide a reliable attitude observation in  real conditions.
 
 \section{Attitude from Accelerometer}
-Measurement model for accelerometer observations $a_y$ can be represented as:
+The measurement model for accelerometer observations $a_y$ can be represented as:
 
 \begin{equation}
 	\mathbf{a}_y = {}^{W}_{B}\mathbf{R}(\boldsymbol{\dot{v}} + \mathbf{g}) + \mathbf{b}_a + \boldsymbol{\mu}_a
@@ -20,9 +20,9 @@ Where:
 	\item[${}\boldsymbol{\mu}_a$] Measurement noise, including all unmodeled dynamics of the system
 \end{eqwhere}
 
-Assuming perfectly static conditions and 0 bias term, the accelerometer measures only the gravitational acceleration vector in the sensor frame. This measurement can be used to calculate a transformation aligning the body frame to the NED frame down direction. It is important to note that this method doesn't provide full orientation of the body, only the attitude can be estimated, while the heading (yaw) remains unobservable.
+Assuming perfectly static conditions and 0 bias term, the accelerometer measures only the gravitational acceleration vector in the sensor frame. This measurement can be used to calculate a transformation aligning the body frame to the NED frame down direction. It is important to note that this method does not provide full orientation of the body, only the attitude can be estimated, while the heading (yaw) remains unobservable.
 
-In most common cases, the sensor will be subject to additional, and often unpredictable external forces, which will make accelerometer only attitude estimation unreliable or even dangerous when used for control purposes.
+In most common cases, the sensor will be subject to additional and often unpredictable external forces, which will make accelerometer only attitude estimation unreliable or even dangerous when used for control purposes.
 
 \section{Attitude from Gyroscope}
 
@@ -40,9 +40,9 @@ Where:
 	\item[${}\boldsymbol{\mu}_g$] Measurement noise, including all unmodeled dynamics of the system
 \end{eqwhere}
 
-Assuming an initial orientation, which cannot be measured by the gyroscope, the orientation can be estimated by integrating the angular velocity over time. This method gives an full orientation estimate, which is mostly unaffected by external linear accelerations. However, due to measurement noise, numerical integration errors and most importantly, the slowly varying bias, this estimate will drift over time, making it unreliable for long term use.
+Assuming an initial orientation, which cannot be measured by the gyroscope, the orientation can be estimated by integrating the angular velocity over time. This method gives a full orientation estimate, which is mostly unaffected by external linear accelerations. However, due to measurement noise, numerical integration errors and, most importantly, the slowly varying bias, this estimate will drift over time, making it unreliable for long term use.
 
 \section{Attitude from Sensor Fusion}
 
-While achieving a reliable and universal attitude estimation from either of the two sensors alone is not possible, combining the measurements from both sensors can provide a much more accurate and stable estimate.
-The gyroscope measurement is much more reliable and accurate in short term observations, so its going to serve a the "base" of the algorithm. The accelerometer measurement will correct the errors that accumulate in the gyroscope based estimate, as well as providing an initial orientation estimate.
+Although achieving a reliable and universal attitude estimation from either of the two sensors alone is not possible, combining the measurements from both sensors can provide a much more accurate and stable estimate.
+The gyroscope measurement is much more reliable and accurate in short term observations, so its going to serve as the "base" of the algorithm. The accelerometer measurement will correct the errors that accumulate in the gyroscope based estimate, as well as providing an initial orientation estimate.

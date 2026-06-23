@@ -1,23 +1,23 @@
 \chapter{Methods of Attitude Representation}
 
-An attitude of a body is a description of angular position of its body (senor) frame, relative to the world (Earth) reference frame.
+An attitude of a body is a description of the angular position of its body (senor) frame relative to the world (Earth) reference frame.
 
-The most commonly known method for expressing the attitude of a body is through the use of Euler angles. This method describes the attitude as a sequence of three rotations around three separate axis of reference. While this method is simple and very intuitive it is also, arguably the most problematic of all methods mentioned here. The biggest problem of Euler angles representation is the phenomenon of gimbal lock. It appears when two rotation axis become parallel, which results in the loss of one degree of freedom. This can lead to singularities in the mathematical representation, which in turn causes difficulties and discontinuities in attitude representation. On top of that, calculating rotations of vectors between two frames described with Euler angles involves the use of, computationally expensive trigonometric functions.
-Additionally, due to the fact that rotations around each axis are calculated separately, the order of rotations matters, and gives different result based on chosen convention.
+The most commonly known method for expressing the attitude of a body is through the use of Euler angles. This method describes the attitude as a sequence of three rotations around three separate axes of reference. Although this method is simple and very intuitive, it is also arguably the most problematic of all the methods mentioned here. The biggest problem of Euler angles representation is the phenomenon of gimbal lock. It appears when two rotation axes become parallel, resulting in the loss of one degree of freedom. This can lead to singularities in the mathematical representation, which in turn causes difficulties and discontinuities in attitude representation. In addition, calculating the rotations of the vectors between two frames described with Euler angles involves the use of computationally expensive trigonometric functions.
+Additionally, because rotations around each axis are calculated separately, the order of rotations matters and gives a different result based on chosen convention.
 
-Most of the problems of Euler angles can be solved by using rotation matrices. A rotation matrix is a 3x3 orthogonal matrix with determinant equal to 1, which represents a rotation in three-dimensional space. This method does not suffer from gimbal lock and provides a unique way of representing rotations, at a cost of reducing intuitiveness of the representation. Rotating a vector using a rotation matrix requires only matrix multiplication. The biggest issue with rotation matrices is their memory footprint. They require 9 parameters to represent a rotation, which is more than necessary and leads to additional numeric complexity and instability. The matrixes will also accumulate numerical errors during rotation concatenation, and will require re-orthogonalization to maintain their properties.
+Most of the problems of Euler angles can be solved by using rotation matrices. A rotation matrix is a 3x3 orthogonal matrix with it's determinant equal to 1, which represents a rotation in three-dimensional space. This method does not suffer from gimbal lock and provides a unique way of representing rotations, at a cost of reducing intuitiveness of the representation. Rotating a vector using a rotation matrix requires only matrix multiplication. The biggest issue with rotation matrices is their memory footprint. They require 9 parameters to represent a rotation, which is more than necessary and leads to additional numeric complexity and instability. The matrixes will also accumulate numerical errors during rotation concatenation and will require re-orthogonalization to maintain their properties.
 
-Because of that one more improvement can be made, when it comes to attitude representation, by using unit quaternions. Quaternions are a mathematical construct that extends complex numbers and can be used to represent rotations in three-dimensional space. It consists of four components: one real (scalar) part, and three imaginary parts forming a 3d vector. Quaternions bring the same improvements as rotation matrices, while also reducing the memory footprint to less then half. They also reduce the number of multiplications required for vector rotation and concatenation, which makes them a natural choice for representing rotations.
-Quaternions still suffer from the same numerical issues as rotation matrixes but maintaining the unit norm requires much less computational effort.
+Because of that, one more improvement can be made when it comes to attitude representation. It can be achieved through the use of unit quaternions. Quaternions bring the same improvements, over the Euler angles as rotation matrices, while reducing the memory footprint to less than half. They also reduce the number of multiplications required for vector rotation and concatenation, which makes them a natural choice for representing rotations.
+Quaternions still suffer from the same numerical issues as rotation matrices, but maintaining the unit norm requires much less computational effort.
 
 \section{Representing Rotations as Quaternions}
 
-Quaternions are defined as a four-dimensional extension of complex numbers, consisting of one real part and three imaginary parts. A quaternion can be represented as:
+Quaternions are defined as a four-dimensional extension of complex numbers consisting of one real part and three imaginary parts. A quaternion can be represented as:
 \begin{equation}
 	\boldsymbol{q} = a + b\mathbf{i} + c\mathbf{j} + d\mathbf{k} = \left[ q_0\ q_1\ q_2\ q_3 \right]^T, \quad \boldsymbol{q} \in \mathbb{H}
 	\label{eq:qt}
 \end{equation}
-where $a,b,c,d$ are real numbers and $i,j,k$ are the basis vectors. The set of all quaternions is denoted by $\mathbb{H}$, for William Rowan Hamilton, who first introduced quaternions in 1843. Neutral element of this set is the unit quaternion:
+where $a,b,c,d$ are real numbers and $i,j,k$ are the basis vectors. The set of all quaternions is denoted by $\mathbb{H}$, for William Rowan Hamilton, who first introduced quaternions in 1843. The neutral element of this set is the unit quaternion:
 \begin{equation}
 	\boldsymbol{q}_I = 1 + 0\mathbf{i} + 0\mathbf{j} + 0\mathbf{k} = \left[ 1\ 0\ 0\ 0 \right]^T
 \end{equation}
@@ -30,7 +30,7 @@ Other common notation for quaternions is to represent them as a scalar part and 
 	\label{eq:qt_vec}
 \end{equation}
 %
-Multiplication between quaternions, called a Hamilton product is defined as:
+Multiplication between quaternions, called a Hamilton product, is defined as:
 %
 \begin{equation}
 	\boldsymbol{q}_1 \otimes \boldsymbol{q}_2 = \begin{bmatrix} s_1s_2 - \boldsymbol{v}_1^T\boldsymbol{v}_2 \\ s_1\boldsymbol{v}_2 + s_2\boldsymbol{v}_1 + \boldsymbol{v}_1 \times \boldsymbol{v}_2 \end{bmatrix}
@@ -56,16 +56,16 @@ Let a quaternion representing a rotation of frame A with respect to frame B be d
 		{}^{B}\mathbf{u}\sin{\frac{\theta}{2}}\end{pmatrix}
 	\label{eq:qt:rot1}
 \end{equation}
-Every time a orientation is described using quaternion without specifying the frames, it will be assumed that the quaternion describes the rotation of world frame with respect to the body frame.
+Every time an orientation is described using the quaternion without specifying the frames, it will be assumed that the quaternion describes the rotation of the world frame with respect to the body frame.
 \begin{equation}
 	\boldsymbol{q} = {}^{B}_{W}\boldsymbol{q}
 \end{equation}
 A rotation described by a quaternion is unique, up to its sign. Both $\boldsymbol{q}$ and $-\boldsymbol{q}$ represent the same rotation in space.
-To inverse the rotation described by a quaternion, the quaternion conjugate should be used:
+To inverse the rotation described by a quaternion, it's conjugate can be used:
 \begin{equation}
 	^{A}_{B}\boldsymbol{q} = {}^{B}_{A}\boldsymbol{q}^*
 \end{equation}
-Quaternion rotations can be easily concatenated together, using Hamilton product:\
+Quaternion rotations can be easily concatenated together using the Hamilton product:\
 \begin{equation}
 	^{C}_{A}\boldsymbol{q} = {}^{B}_{A}\boldsymbol{q} \otimes {}^{C}_{B}\boldsymbol{q}
 \end{equation}
@@ -77,12 +77,12 @@ Rotation quaternions can be interpolated using spherical linear interpolation (S
 \begin{equation}
 	\textit{SLERP}(\boldsymbol{q},\boldsymbol{p}, \alpha) =  \frac{\sin(\alpha\Omega)}{\sin(\Omega)}\boldsymbol{p} + \frac{\sin([1-\alpha]\Omega)}{\sin(\Omega)}\boldsymbol{q}, \alpha \in [0, 1]
 \end{equation}
-This interpolation can be also approximated with a simple linear interpolation (LERP), reducing the computational cost at the cost of the accuracy and loss of the unit norm.
+This interpolation can also be approximated with a simple linear interpolation (LERP), reducing the computational cost at the cost of the accuracy and loss of the unit norm.
 \begin{equation}
 	\textit{LERP}(\boldsymbol{q},\boldsymbol{p}, \alpha) =  (1-\alpha)\boldsymbol{q} + \alpha\boldsymbol{p}, \alpha \in [0, 1]
 \end{equation}
 
-To perform any mathematical operation between a vector and quaternion, it is a common practice to first convert the vector into a pure quaternion $\boldsymbol{p}$ i.e. quaternion with a zero scalar part. The transformed vector can be later extracted from the pure quaternion by taking its vector part.
+To perform any mathematical operation between a vector and a quaternion, it is common practice to first convert the vector into a pure quaternion $\boldsymbol{p}$, i.e., a quaternion with a zero scalar part. The transformed vector can be later extracted from the pure quaternion by taking its vector part.
 \begin{equation}
 	{}^{B}\boldsymbol{p} = \begin{bmatrix} 0 \\ {}^{B}\mathbf{v} \end{bmatrix}
 	\label{eq:qt:vec}
@@ -94,7 +94,7 @@ To perform a rotation of a vector ${}^{B}\mathbf{v}$ from frame B to frame A, th
 	\label{eq:qt:rot2}
 \end{equation}
 % TODO: Check later 
-Quaternion can also be converted into a rotation matrix:
+The quaternion can also be converted into a rotation matrix:
 \begin{equation}
 	\boldsymbol{R}(\boldsymbol{q}) = \begin{bmatrix}
 		1 - 2(c^2 + d^2) & 2(bc - ad)       & 2(bd + ac)       \\
@@ -107,8 +107,8 @@ Quaternion can also be converted into a rotation matrix:
 
 \section{Chosen frame of reference}
 
-The global frame of reference will be represented using NED (North-East-Down) coordinate system. The NED system is a right-handed local tangent plane coordinate system. The x-axis of this system points towards the north, the y-axis points towards the east and the z-axis points downwards, aligning with local gravity vector.
+The global frame of reference will be represented using NED (North-East-Down) coordinate system. The NED system is a right-handed local tangent plane coordinate system. The x-axis of this system points towards the north, the y-axis points towards the east, and the z-axis points downward, aligning with the local gravity vector.
 
-Because of common quaternion conventions, every quaternion representing a rotation will describe a orientation of the world frame relative to the body frame. The body frame will be denoted as $\{B\}$, the world frame as $\{W\}$. Additionally, any estimator will provide only an approximation of the real world frame rotation, this can be fought of as a separate estimator frame $\{E\}$.
+Because of common quaternion conventions, every quaternion representing a rotation will describe an orientation of the world frame relative to the body frame. The body frame will be denoted as $\{B\}$, the world frame as $\{W\}$. Additionally, any estimator will provide only an approximation of the real world frame rotation, this can be fought of as a separate estimator frame $\{E\}$.
 
 % TODO: Figure?
