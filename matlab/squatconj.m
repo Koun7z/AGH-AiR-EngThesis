@@ -1,12 +1,13 @@
 function [ n ] = squatconj( q )
 %squatconj Compute the conjugate of a quaternion
 %  
-    [r,c] = size(q);
+    [rq,cq] = size(q);
 
-    if c~= 4
-        error('squatconj expect q in format nx4');
+    if(rq ~= 4 || cq ~=1)
+        error("Input quaternion must be a 4 element column vector");
     end
     
-    n = [q(:,1) -q(:,2) -q(:,3) -q(:,4)];
+    
+    n = [q(1); -q(2); -q(3); -q(4)];
 
 end
