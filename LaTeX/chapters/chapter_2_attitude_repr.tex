@@ -93,15 +93,24 @@ To perform a rotation of a vector ${}^{B}\mathbf{v}$ from frame B to frame A, th
 	{q} \otimes {}^{B}\boldsymbol{p} \otimes {}^{B}_{A}\boldsymbol{q}^*
 	\label{eq:qt:rot2}
 \end{equation}
-% TODO: Check later 
+
 The quaternion can also be converted into a rotation matrix:
 \begin{equation}
 	\boldsymbol{R}(\boldsymbol{q}) = \begin{bmatrix}
-		1 - 2(c^2 + d^2) & 2(bc - ad)       & 2(bd + ac)       \\
-		2(bc + ad)       & 1 - 2(b^2 + d^2) & 2(cd - ab)       \\
-		2(bd - ac)       & 2(cd + ab)       & 1 - 2(b^2 + c^2)
+		q_0^2 + q_1^2 - q_2^2 - q_3^2 & 2(q_1q_2 - q_0q_3)            & 2(q_1q_3 + q_0q_2)            \\
+		2(q_1q_2 + q_0q_3)            & q_0^2 - q_1^2 + q_2^2 - q_3^2 & 2(q_2q_3 - q_0q_1)            \\
+		2(q_1q_3 - q_0q_2)            & 2(q_2q_3 + q_0q_1)            & q_0^2 - q_1^2 - q_2^2 + q_3^2
 	\end{bmatrix}
-	\label{eq:qt:rot3}
+	\label{eq:q_mat}
+\end{equation}
+Or alternatively, after enforcing the unit norm of the quaternion, as:
+\begin{equation}
+	\boldsymbol{R}(\boldsymbol{q}) = \begin{bmatrix}
+		1 - 2(q_2^2 + q_3^2) & 2(q_1q_2 - q_0q_3)   & 2(q_1q_3 + q_0q_2)   \\
+		2(q_1q_2 + q_0q_3)   & 1 - 2(q_1^2 + q_3^2) & 2(q_2q_3 - q_0q_1)   \\
+		2(q_1q_3 - q_0q_2)   & 2(q_2q_3 + q_0q_1)   & 1 - 2(q_1^2 + q_2^2)
+	\end{bmatrix}
+	\label{eq:q_mat_1}
 \end{equation}
 
 

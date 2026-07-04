@@ -29,7 +29,10 @@ In most common cases, the sensor will be subject to additional and often unpredi
 Gyroscope measurements $\Omega_y$ can be represented as:
 
 \begin{equation}
-	\boldsymbol{\Omega}_y = {}^B\boldsymbol{\Omega} + \mathbf{b}_g + \boldsymbol{\mu}_g
+	\begin{aligned}
+		\boldsymbol{\Omega}_y & = {}^B\boldsymbol{\Omega} + \mathbf{b}_g + \boldsymbol{\mu}_g \\
+		\boldsymbol{\Omega}_y & = \left[\omega_{x}, \omega_{y}, \omega_{z}\right]^T           \\
+	\end{aligned}
 	\label{eq:y_gyro}
 \end{equation}
 
@@ -41,6 +44,12 @@ Where:
 \end{eqwhere}
 
 Assuming an initial orientation, which cannot be measured by the gyroscope, the orientation can be estimated by integrating the angular velocity over time. This method gives a full orientation estimate, which is mostly unaffected by external linear accelerations. However, due to measurement noise, numerical integration errors and, most importantly, the slowly varying bias, this estimate will drift over time, making it unreliable for long term use.
+
+A commonly used quaternion derivative model, that can be used to integrate the gyroscope measurements, is given by:
+\begin{equation}
+	\dot{\boldsymbol{q}} = \frac{1}{2}\boldsymbol {q} \otimes \boldsymbol{p}(^{B}\boldsymbol{\Omega})
+	\label{eq:gyro_q_dot}
+\end{equation}
 
 \section{Attitude from Sensor Fusion}
 

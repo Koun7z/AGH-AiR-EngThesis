@@ -88,4 +88,133 @@ Applying the full correction term will instantaneously rotate the predicted orie
 
 \section{Madgwick filter}
 
+In \cite{Madgwick2010AnEO} Sebastian O.H. Madgwick presents an estimation algorithm that departs from the traditional observer design, and threats the problem of attitude estimation, directly as an optimization problem. The algorithm uses the accelerometer and magnetometer measurements in an analytically derived gradient descent algorithm, minimizing the gyroscope measurement errors.
+
+The optimization problem from IMU observations is defined as follows:
+\begin{equation}
+	\hat{\boldsymbol{q}}_{k+1} = \hat{\boldsymbol{q}}_{k} - \mu\frac{\nabla f(\hat{\boldsymbol{q}}_{k}, \boldsymbol{a}_y)}{||\nabla f(\hat{\boldsymbol{q}}_{k}, \boldsymbol{a}_y)||}
+\end{equation}
+
+\begin{equation}
+	\nabla f(\hat{\boldsymbol{q}}_{k}, \boldsymbol{a}_y) = \boldsymbol{J}^T(\boldsymbol{q}_{k}) f(\hat{\boldsymbol{q}}_{k}, \boldsymbol{a}_y)
+\end{equation}
+
+\begin{equation}
+	f(\boldsymbol{q}, {}^B\boldsymbol{a}) = \begin{bmatrix}
+		2(q_1q_3 - q_0q_2) - a_{x} \\
+		2(q_0q_1 + q_2q_3) - a_{y} \\
+		2(\frac{1}{2} - q_1^2 - q_2^2) - a_{z}\
+	\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+	\boldsymbol{J}(\boldsymbol{q}) = \begin{bmatrix}
+		-2q_2 & 2q_3  & -2q_0 & 2q_1 \\
+		2q_1  & 2q_0  & 2q_3  & 2q_2 \\
+		0     & -4q_1 & -4q_2 & 0    \\
+	\end{bmatrix}
+\end{equation}
+Using this optimization problem, the filter dynamics can be defined as:
+\begin{equation}
+	\begin{aligned}
+		\hat{\boldsymbol{q}}_{est,t}             & = \hat{\boldsymbol{q}}_{est,t-1} + \dot{\boldsymbol{q}}_{est,t}\Delta t                                                                \\
+		\dot{\boldsymbol{q}}_{est,t}             & = \dot{\boldsymbol{q}}_{\omega,t} - \beta \dot{\hat{\boldsymbol{q}}}_{\epsilon, t}                                                     \\
+		\dot{\hat{\boldsymbol{q}}}_{\epsilon, t} & = \frac{\nabla f(\hat{\boldsymbol{q}}_{est,t- 1}, \boldsymbol{a}_y)}{||\nabla f(\hat{\boldsymbol{q}}_{est,t - 1}, \boldsymbol{a}_y)||} \\
+	\end{aligned}
+\end{equation}
+
+\newpage
 \section{Extended Kalman Filter}
+
+The Extended Kalman Filter is a generalization of the classic linear Kalman observer, that allows it to be applied to nonlinear systems. It is achieved by linearizing the system dynamics and measurement equations around the current state estimate, and then applying the standard Kalman filter equations to the linearized system.
+
+The discrete observer state transition and observation models are defined as follows:
+\begin{equation}
+	\begin{aligned}
+		\boldsymbol{x}_{k} & = f(\boldsymbol{x}_{k-1}, \boldsymbol{u}_{k-1}) + \boldsymbol{w}_{k-1} \\
+		\boldsymbol{z}_{k} & = h(\boldsymbol{x}_{k}) + \boldsymbol{v}_{k}                           \\
+	\end{aligned}
+\end{equation}
+
+EKF is a recursive algorithm, which consists of two steps: prediction and correction (or innovation). In the prediction step, the state estimate and error covariance are propagated forward in time using the system dynamics. In the correction step, the state estimate and its error covariance are corrected using the new measurement and calculated Kalman gain.
+
+Prediction:
+\begin{equation}
+	\begin{aligned}
+		\hat{\boldsymbol{x}}_{k|k-1} & = f(\hat{\boldsymbol{x}}_{k-1|k-1}, \boldsymbol{u}_{k-1})                                            \\
+		\boldsymbol{P}_{k|k-1}       & = \boldsymbol{F}_k \boldsymbol{P}_{k-1|k-1} \boldsymbol{F}_k^T + \boldsymbol{Q}_{k -1}               \\
+		\boldsymbol{F}_k             & = \frac{\partial f}{\partial \boldsymbol{x}}|_{\hat{\boldsymbol{x}}_{k-1|k-1}, \boldsymbol{u}_{k-1}}
+	\end{aligned}
+\end{equation}
+
+Where:
+\begin{eqwhere}[3cm]
+	\item[$\boldsymbol{P}_{k|k-1}  $] Predicted covariance of the state estimate
+	\item[$\boldsymbol{F}_k$] State transition Jacobian
+	\item[$\boldsymbol{Q}_{k-1}$] Process noise covariance matrix
+\end{eqwhere}
+
+Innovation:
+\begin{equation}
+	\begin{aligned}
+		\tilde{\boldsymbol{y}}_k   & = \boldsymbol{z}_k - h(\hat{\boldsymbol{x}}_{k|k-1})                            \\
+		\boldsymbol{S}_k           & = \boldsymbol{H}_k \boldsymbol{P}_{k|k-1} \boldsymbol{H}_k^T + \boldsymbol{R}_k \\
+		\boldsymbol{K}_k           & = \boldsymbol{P}_{k|k-1} \boldsymbol{H}_k^T \boldsymbol{S}_k^{-1}               \\
+		\hat{\boldsymbol{x}}_{k|k} & = \hat{\boldsymbol{x}}_{k|k-1} + \boldsymbol{K}_k \tilde{\boldsymbol{y}}_k      \\
+		\boldsymbol{P}_{k|k}       & = (\mathbf{I} - \boldsymbol{K}_k\boldsymbol{H}_k)\boldsymbol{P}_{k|k-1}         \\
+		\boldsymbol{H}_k           & = \frac{\partial h}{\partial \boldsymbol{x}}|_{\hat{\boldsymbol{x}}_{k|k-1}}
+	\end{aligned}
+\end{equation}
+
+Where:
+\begin{eqwhere}[3cm]
+	\item[$\boldsymbol{y}_k$] Measurement innovation
+	\item[$\boldsymbol{S}_k$] Innovation covariance
+	\item[$\boldsymbol{H}_k$] Observation model Jacobian
+	\item[$\boldsymbol{R}_k$] Measurement noise covariance matrix
+	\item[$\boldsymbol{K}_k$] Near-optimal Kalman gain
+\end{eqwhere}
+
+\newpage
+
+When applying the EKF to the problem of attitude estimation, the gyroscope measurements are used as the model input, while the accelerometer and optionally magnetometer measurements are used for innovation.
+The state vector $\boldsymbol{x}$ and the input vector $\boldsymbol{u}$ can be defined as follows:
+%
+\begin{equation}
+	\boldsymbol{x} = \boldsymbol{q} = \left[ q_0\ q_1\ q_2\ q_3 \right]^T
+\end{equation}
+%
+\begin{equation}
+	\boldsymbol{u} = \boldsymbol{\Omega}_{y} = \left[ \omega_{x}, \omega_{y}, \omega_{z} \right]^T
+\end{equation}
+%
+The state transition function and its Jacobian can be defined using \eqref{eq:gyro_q_dot}
+\begin{equation}
+	f(\boldsymbol{x}_{k}, \boldsymbol{u}_{k}) = \boldsymbol{q}_{k} + \frac{1}{2}\boldsymbol{q}_{k} \otimes \boldsymbol{p}(\boldsymbol{\Omega}_{y,k})\Delta t
+\end{equation}
+
+\begin{equation}
+	\boldsymbol{F}(\boldsymbol{x}_{k}, \boldsymbol{u}_{k}) = \begin{bmatrix}
+		1                               & -\frac{1}{2}\omega_{x,k}\Delta t & -\frac{1}{2}\omega_{y,k}\Delta t & -\frac{1}{2}\omega_{z,k}\Delta t \\
+		\frac{1}{2}\omega_{x,k}\Delta t & 1                                & \frac{1}{2}\omega_{z,k}\Delta t  & -\frac{1}{2}\omega_{y,k}\Delta t \\
+		\frac{1}{2}\omega_{y,k}\Delta t & -\frac{1}{2}\omega_{z,k}\Delta t & 1                                & \frac{1}{2}\omega_{x,k}\Delta t  \\
+		\frac{1}{2}\omega_{z,k}\Delta t & \frac{1}{2}\omega_{y,k}\Delta t  & -\frac{1}{2}\omega_{x,k}\Delta t & 1
+	\end{bmatrix}
+\end{equation}
+
+With IMU only attitude estimation, the observation $\boldsymbol{z}_k$ represent the accelerometer measurements in the body frame.
+The measurement estimate can be computed by rotating the global gravity vector ${}^{W}\boldsymbol{g} = [0\ 0\ 1]^T$ into the body frame using the current orientation estimate $\hat{\boldsymbol{q}}_{k|k-1}$:
+\begin{equation}
+	\begin{aligned}
+		\tilde{y}_k         & = \boldsymbol{a}_y - h(\boldsymbol{q}_k)                       \\
+		h(\boldsymbol{q}_k) & = \mathbf{R}^T(\hat{\boldsymbol{q}}_{k})\ {}^{W}\boldsymbol{g} \\
+	\end{aligned}
+\end{equation}
+The Jacobian of the observation model is:
+\begin{equation}
+	\boldsymbol{H}(\boldsymbol{x}_k) = \begin{bmatrix}
+		-2q_2 & 2q_3  & -2q_0 & 2q_1 \\
+		2q_1  & 2q_0  & 2q_3  & 2q_2 \\
+		2q_0  & -2q_1 & -2q_2 & 2q_3
+	\end{bmatrix}
+\end{equation}
