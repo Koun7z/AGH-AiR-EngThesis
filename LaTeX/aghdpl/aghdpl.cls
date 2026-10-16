@@ -68,6 +68,7 @@
 \RequirePackage{amsmath}
 \RequirePackage{amsthm}
 
+\RequirePackage[hidelinks]{hyperref}
 \RequirePackage{graphicx}
 \RequirePackage[usenames]{color}
 \RequirePackage{url}

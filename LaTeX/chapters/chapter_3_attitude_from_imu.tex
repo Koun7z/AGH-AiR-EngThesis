@@ -30,15 +30,15 @@ Gyroscope measurements $\Omega_y$ can be represented as:
 
 \begin{equation}
 	\begin{aligned}
-		\boldsymbol{\Omega}_y & = {}^B\boldsymbol{\Omega} + \mathbf{b}_g + \boldsymbol{\mu}_g \\
-		\boldsymbol{\Omega}_y & = \left[\omega_{x}, \omega_{y}, \omega_{z}\right]^T           \\
+		\boldsymbol{\omega}_y & = {}^B\boldsymbol{\omega} + \mathbf{b}_g + \boldsymbol{\mu}_g \\
+		\boldsymbol{\omega}_y & = \left[\omega_{x}, \omega_{y}, \omega_{z}\right]^T           \\
 	\end{aligned}
 	\label{eq:y_gyro}
 \end{equation}
 
 Where:
 \begin{eqwhere}[3cm]
-	\item[${}^B\boldsymbol{\Omega}$] Real angular velocity vector in the sensor frame
+	\item[${}^B\boldsymbol{\omega}$] Real angular velocity vector in the sensor frame
 	\item[${}\mathbf{b}_g$] Gyroscope bias, slowly varying over time
 	\item[${}\boldsymbol{\mu}_g$] Measurement noise, including all unmodeled dynamics of the system
 \end{eqwhere}

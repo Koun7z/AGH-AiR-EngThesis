@@ -7,8 +7,22 @@ Additionally, because rotations around each axis are calculated separately, the 
 
 Most of the problems of Euler angles can be solved by using rotation matrices. A rotation matrix is a 3x3 orthogonal matrix with it's determinant equal to 1, which represents a rotation in three-dimensional space. This method does not suffer from gimbal lock and provides a unique way of representing rotations, at a cost of reducing intuitiveness of the representation. Rotating a vector using a rotation matrix requires only matrix multiplication. The biggest issue with rotation matrices is their memory footprint. They require 9 parameters to represent a rotation, which is more than necessary and leads to additional numeric complexity and instability. The matrixes will also accumulate numerical errors during rotation concatenation and will require re-orthogonalization to maintain their properties.
 
-Because of that, one more improvement can be made when it comes to attitude representation. It can be achieved through the use of unit quaternions. Quaternions bring the same improvements, over the Euler angles as rotation matrices, while reducing the memory footprint to less than half. They also reduce the number of multiplications required for vector rotation and concatenation, which makes them a natural choice for representing rotations.
-Quaternions still suffer from the same numerical issues as rotation matrices, but maintaining the unit norm requires much less computational effort.
+Because of that, one more improvement can be made when it comes to attitude representation. It can be achieved through the use of unit quaternions. Quaternions bring the same improvements, over the Euler angles as rotation matrices, while reducing the memory footprint to less than half. They also reduce the number of multiplications required for vector rotation and offer almost as efficient vector rotation as rotation matrices. Quaternions still suffer from the same numerical issues as rotation matrices, but maintaining the unit norm requires much less computational effort. This makes them a natural choice for representing rotations.
+
+
+\begin{table}[H]
+	\centering
+	\caption{Comparison of attitude representation methods}
+	\begin{tabular}{p{0.2\textwidth} | p{0.4\textwidth} p{0.4\textwidth}}
+	\toprule
+	Method & Advantage & Disadvantage \\
+	\midrule
+	Euler Angles & Intuitive, low memory footprint & Gimbal lock, computationally expensive \\
+	Rotation Matrices & No gimbal lock, unique representation, efficient rotation & Memory footprint, requires re-orthogonalization \\
+	Quaternions & No gimbal lock, almost unique representation, efficient concatenation and compared to matrix - reduced memory footprint, and almost as efficient rotation & Requires normalization, sign ambiguity, slightly higher memory footprint than Euler angles \\
+	\bottomrule
+	\end{tabular}
+\end{table}
 
 \section{Representing Rotations as Quaternions}
 

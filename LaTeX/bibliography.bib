@@ -22,7 +22,7 @@
   url      = {https://www.mdpi.com/1424-8220/15/8/19302},
   pubmedid = {26258778},
   issn     = {1424-8220},
-  langid    = {english},
+  langid   = {english},
   abstract = {Orientation estimation using low cost sensors is an important task for Micro Aerial Vehicles (MAVs) in order to obtain a good feedback for the attitude controller. The challenges come from the low accuracy and noisy data of the MicroElectroMechanical System (MEMS) technology, which is the basis of modern, miniaturized inertial sensors. In this article, we describe a novel approach to obtain an estimation of the orientation in quaternion form from the observations of gravity and magnetic field. Our approach provides a quaternion estimation as the algebraic solution of a system from inertial/magnetic observations. We separate the problems of finding the “tilt” quaternion and the heading quaternion in two sub-parts of our system. This procedure is the key for avoiding the impact of the magnetic disturbances on the roll and pitch components of the orientation when the sensor is surrounded by unwanted magnetic flux. We demonstrate the validity of our method first analytically and then empirically using simulated data. We propose a novel complementary filter for MAVs that fuses together gyroscope data with accelerometer and magnetic field readings. The correction part of the filter is based on the method described above and works for both IMU (Inertial Measurement Unit) and MARG (Magnetic, Angular Rate, and Gravity) sensors. We evaluate the effectiveness of the filter and show that it significantly outperforms other common methods, using publicly available datasets with ground-truth data recorded during a real flight experiment of a micro quadrotor helicopter.},
   doi      = {10.3390/s150819302}
 }
@@ -33,4 +33,20 @@
   year   = {2010},
   url    = {https://api.semanticscholar.org/CorpusID:2976407},
   langid = {english}
+}
+
+@article{Kalman1960ANeA,
+  author   = {Kalman, R. E.},
+  title    = {A New Approach to Linear Filtering and Prediction Problems},
+  journal  = {Journal of Basic Engineering},
+  volume   = {82},
+  number   = {1},
+  pages    = {35-45},
+  year     = {1960},
+  month    = {03},
+  abstract = {The classical filtering and prediction problem is re-examined using the Bode-Shannon representation of random processes and the “state-transition” method of analysis of dynamic systems. New results are: (1) The formulation and methods of solution of the problem apply without modification to stationary and nonstationary statistics and to growing-memory and infinite-memory filters. (2) A nonlinear difference (or differential) equation is derived for the covariance matrix of the optimal estimation error. From the solution of this equation the co-efficients of the difference (or differential) equation of the optimal linear filter are obtained without further calculations. (3) The filtering problem is shown to be the dual of the noise-free regulator problem. The new method developed here is applied to two well-known problems, confirming and extending earlier results. The discussion is largely self-contained and proceeds from first principles; basic concepts of the theory of random processes are reviewed in the Appendix.},
+  issn     = {0021-9223},
+  doi      = {10.1115/1.3662552},
+  url      = {https://doi.org/10.1115/1.3662552},
+  eprint   = {https://asmedigitalcollection.asme.org/fluidsengineering/article-pdf/82/1/35/5518977/35_1.pdf}
 }

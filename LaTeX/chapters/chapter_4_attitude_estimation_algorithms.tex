@@ -14,7 +14,7 @@ Where $\theta$ is the angle associated with the rotation between those frames.
 The filter dynamics, in quaternion form, is given by:
 \begin{equation}
 	\begin{aligned}
-		\dot{\mathbf{\hat{q}}}     & = \frac{1}{2} \mathbf{\hat{q}} \otimes \mathbf{p}(\boldsymbol{\Omega}_y - \mathbf{\hat{b}} + k_p \boldsymbol{\omega}) \\
+		\dot{\mathbf{\hat{q}}}     & = \frac{1}{2} \mathbf{\hat{q}} \otimes \mathbf{p}(\boldsymbol{\omega}_y - \mathbf{\hat{b}} + k_p \boldsymbol{\omega}) \\
 		\boldsymbol{\dot{\hat{b}}} & = -k_I \boldsymbol{\omega}
 	\end{aligned}
 \end{equation}
@@ -23,6 +23,20 @@ The goal of the estimator will be to find a term $\boldsymbol{\omega}$ that will
 \begin{equation}
 	\boldsymbol{\omega} = vex(\mathbb{P}_a(\hat{\mathbf{R}}^T\mathbf{R}_y)) = sin(\theta)\mathbf{u}
 \end{equation}
+
+Where:
+ \begin{equation}
+		\boldsymbol{\omega}_\times = \begin{bmatrix}
+			0          & -\omega_z & \omega_y  \\
+			\omega_z   & 0         & -\omega_x \\
+			-\omega_y  & \omega_x  & 0	
+		\end{bmatrix}, \boldsymbol{\omega} \in \mathbb{R}^3 \\ 
+ \end{equation}
+
+ \begin{equation}
+	vex(\boldsymbol{\omega}_\times) = \boldsymbol{\omega}
+ \end{equation}
+
 With normalized accelerometer measurement $v$ and expected gravity vector $\hat{v} = \mathbf{R}(\mathbf{\hat{q}})^T\mathbf{g}$, $g = [0, 0, 1]^T$, the correction term can be expressed as:
 \begin{equation}
 	\boldsymbol{\omega} = v \times \hat{v}
@@ -31,9 +45,9 @@ With normalized accelerometer measurement $v$ and expected gravity vector $\hat{
 With the correction term defined, the full explicit complementary filter dynamics can be implemented as follows:
 \begin{equation}
 	\begin{aligned}
-		\dot{\hat{q}}   & = \frac{1}{2} \hat{q} \otimes {p}(\Omega_y - \hat{b} + k_p \omega) \\
-		{\dot{\hat{b}}} & = -k_I \omega                                                      \\
-		{\omega}        & = k_I(v \times \hat{v})
+		\dot{\hat{\boldsymbol{q}}}   & = \frac{1}{2} \hat{\boldsymbol{q}} \otimes {\boldsymbol{p}}(\boldsymbol{\omega}_y - \hat{\boldsymbol{b}} + k_p \boldsymbol{\omega}) \\
+		{\dot{\hat{\boldsymbol{b}}}} & = -k_I \boldsymbol{\omega}                                                      \\
+		\boldsymbol{\omega}        & = k_I(\boldsymbol{v} \times \hat{\boldsymbol{v}})
 	\end{aligned}
 \end{equation}
 
@@ -126,7 +140,7 @@ Using this optimization problem, the filter dynamics can be defined as:
 \newpage
 \section{Extended Kalman Filter}
 
-The Extended Kalman Filter is a generalization of the classic linear Kalman observer, that allows it to be applied to nonlinear systems. It is achieved by linearizing the system dynamics and measurement equations around the current state estimate, and then applying the standard Kalman filter equations to the linearized system.
+The Extended Kalman Filter is a generalization of the classic linear Kalman observer \cite{Kalman1960ANeA}, that allows it to be applied to nonlinear systems. It is achieved by linearizing the system dynamics and measurement equations around the current state estimate, and then applying the standard Kalman filter equations to the linearized system.
 
 The discrete observer state transition and observation models are defined as follows:
 \begin{equation}
