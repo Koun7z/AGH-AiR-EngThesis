@@ -1,0 +1,6 @@
+*
+!.gitignore
+!*.zip
+!*.7z
+!*.tar.xz
+!*.tar.gz

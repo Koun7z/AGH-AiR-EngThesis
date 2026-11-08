@@ -54,6 +54,7 @@ class MDH_Matrix:
         return result
 
 DH_Table: List[MDH_Param] = [
+    #                theta,      alpha,      d,     a
     MDH_Param(   np.pi / 2,          0,    0.2,     0),
     MDH_Param(  -np.pi / 2,  np.pi / 2,      0,     0),
     MDH_Param(           0,          0,      0,  -0.3),

@@ -4,3 +4,6 @@
 [submodule "NucleoIKS01A3/DSP-lib"]
 	path = DSP-lib
 	url = git@github.com:Koun7z/DSP-lib.git
+[submodule "python/stdatalog-pysdk"]
+	path = python/stdatalog-pysdk
+	url = https://github.com/STMicroelectronics/stdatalog-pysdk.git
