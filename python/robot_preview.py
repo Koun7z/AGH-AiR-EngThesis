@@ -8,14 +8,16 @@ import argparse
 
 
 def load_data(file_path):
-    df = pd.read_csv(file_path, skiprows=[0,2])
+    df = pd.read_csv(file_path, skiprows=[0, 2])
     return df
+
 
 def preview_data(df):
 
-    xyz_data = df[["XYZ position(FB) X", "XYZ position(FB) Y", "XYZ position(FB) Z"]].to_numpy().astype(np.float64) / 1000 # to meters
+    xyz_data = df[["XYZ position(FB) X", "XYZ position(FB) Y", "XYZ position(FB) Z"]].to_numpy().astype(
+        np.float64) / 1000  # to meters
     abc_data = df[["XYZ position(FB) A", "XYZ position(FB) B", "XYZ position(FB) C"]].to_numpy().astype(np.float64)
-    time_data = df['Time'].to_numpy().astype(np.float64) / 1000 # to seconds
+    time_data = df['Time'].to_numpy().astype(np.float64) / 1000  # to seconds
 
     print("XYZ Position Data: ", xyz_data.shape)
 
@@ -32,21 +34,20 @@ def preview_data(df):
     plt.ylabel("Tool Position [mm]")
     plt.legend(["X", "Y", "Z"])
 
-
     plt.figure()
     plt.subplot(3, 1, 1)
     plt.plot(time_data, df["XYZ position(FB) A"])
-    plt.plot(time_data, abc_data[:,0], linestyle='--')
+    plt.plot(time_data, abc_data[:, 0], linestyle='--')
     plt.ylabel("Tool A [deg]")
 
     plt.subplot(3, 1, 2)
     plt.plot(time_data, df["XYZ position(FB) B"])
-    plt.plot(time_data, abc_data[:,1], linestyle='--')
+    plt.plot(time_data, abc_data[:, 1], linestyle='--')
     plt.ylabel("Tool B [deg]")
 
     plt.subplot(3, 1, 3)
     plt.plot(time_data, df["XYZ position(FB) C"])
-    plt.plot(time_data, abc_data[:,2], linestyle='--')
+    plt.plot(time_data, abc_data[:, 2], linestyle='--')
     plt.ylabel("Tool C [deg]")
 
     plt.xlabel("Time [s]")
@@ -58,17 +59,18 @@ def preview_data(df):
     plt.legend(["X", "Y", "Z"])
 
     plt.figure()
-    plt.subplot(2,1,1)
+    plt.subplot(2, 1, 1)
     plt.plot(time_data, xyz_acc / 9.81)
     plt.ylabel("Tool Acceleration [g]")
     plt.legend(["X", "Y", "Z"])
 
-    plt.subplot(2,1,2)
-    plt.plot(time_data, np.linalg.norm(xyz_acc, axis=1) / 9.81)    
+    plt.subplot(2, 1, 2)
+    plt.plot(time_data, np.linalg.norm(xyz_acc, axis=1) / 9.81)
     plt.xlabel("Time [s]")
     plt.ylabel("Tool Acceleration Norm [g]")
 
     plt.show()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load and preview data from a CSV file.")

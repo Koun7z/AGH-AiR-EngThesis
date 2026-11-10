@@ -4,6 +4,11 @@ import shutil
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import json
+
+SELECTION_FILE = Path("sync_selection.json")
+
+ROBOT_TS = 0.00356020101010101  #(3.57 / 1000)
 
 
 def prepare_folder(path: str) -> str:
@@ -49,19 +54,19 @@ def get_acc_data(path: str, debug: bool = False) -> tuple[np.ndarray, np.ndarray
     hsd_instance = hsd.create_hsd(acquisition_folder=path)
 
     components = hsd.get_all_components(hsd_instance)
-    if(debug):
+    if (debug):
         for comp in components:
             print(comp.keys())
 
     df_a = hsd.get_dataframe(hsd_instance, components[0])[0]
-    if(debug):
+    if (debug):
         print(df_a.describe())
 
-    
     acc_data = df_a.to_numpy()
-    acc_t = acc_data[:,0] - acc_data[0,0]  # Normalize time to start at 0
+    acc_t = acc_data[:, 0] - acc_data[0, 0]  # Normalize time to start at 0
 
-    return (acc_t, acc_data[:,1:])
+    return (acc_t, acc_data[:, 1:])
+
 
 def get_gyro_data(path: str, debug: bool = False) -> tuple[np.ndarray, np.ndarray]:
     hsd = HSDatalog()
@@ -69,41 +74,70 @@ def get_gyro_data(path: str, debug: bool = False) -> tuple[np.ndarray, np.ndarra
     hsd_instance = hsd.create_hsd(acquisition_folder=path)
 
     components = hsd.get_all_components(hsd_instance)
-    if(debug):
+    if (debug):
         for comp in components:
             print(comp.keys())
 
     df_a = hsd.get_dataframe(hsd_instance, components[1])[0]
-    if(debug):
+    if (debug):
         print(df_a.describe())
 
-    
     acc_data = df_a.to_numpy()
-    acc_t = acc_data[:,0] - acc_data[0,0]  # Normalize time to start at 0
+    acc_t = acc_data[:, 0] - acc_data[0, 0]  # Normalize time to start at 0
 
-    return (acc_t, acc_data[:,1:])
+    return (acc_t, acc_data[:, 1:])
+
 
 def get_ref_xyz_data(path: str, debug: bool = False) -> tuple[np.ndarray, np.ndarray]:
-    src_df = pd.read_csv(Path(path) / "ref_data.csv", skiprows=[0,2])
+    src_df = pd.read_csv(Path(path) / "ref_data.csv", skiprows=[0, 2])
 
-    if(debug):
+    if (debug):
         print(src_df.describe())
         print(src_df.head())
 
     # resample the data to Ts = 3.55 ms because Mitsubishi can't label their own data properly...
-    robot_t = np.arange(len(src_df["Time"])) * (3.55 / 1000)
+    robot_t = np.arange(len(src_df["Time"])) * ROBOT_TS
     robot_xyz = src_df[["XYZ position(FB) X", "XYZ position(FB) Y", "XYZ position(FB) Z"]].to_numpy() / 1000
 
     return (robot_t, robot_xyz)
 
-def get_ref_abc_data(path: str, debug: bool = False) -> tuple[np.ndarray, np.ndarray]:
-    src_df = pd.read_csv(Path(path) / "ref_data.csv", skiprows=[0,2])
 
-    if(debug):
+def get_ref_abc_data(path: str, debug: bool = False) -> tuple[np.ndarray, np.ndarray]:
+    src_df = pd.read_csv(Path(path) / "ref_data.csv", skiprows=[0, 2])
+
+    if (debug):
         print(src_df.describe())
         print(src_df.head())
 
-    robot_t = np.arange(len(src_df["Time"])) * (3.55 / 1000)
+    robot_t = np.arange(len(src_df["Time"])) * ROBOT_TS
     robot_xyz = src_df[["XYZ position(FB) A", "XYZ position(FB) B", "XYZ position(FB) C"]].to_numpy() / 1000
 
     return (robot_t, robot_xyz)
+
+
+def save_sync_selection(path: str, acc_start: np.float64, acc_end: np.float64, robot_start: np.float64,
+                        robot_end: np.float64) -> None:
+
+    dst_path = Path("./tmp", Path(path).name, SELECTION_FILE)
+
+    with open(dst_path, "w") as f:
+        json.dump(
+            {
+                "acc_start": np.float64(acc_start),
+                "acc_end": np.float64(acc_end),
+                "robot_start": np.float64(robot_start),
+                "robot_end": np.float64(robot_end),
+            }, f)
+
+
+def load_sync_selection(path) -> tuple[np.float64, np.float64, np.float64, np.float64] | None:
+
+    dst_path = Path("./tmp", Path(path).name, SELECTION_FILE)
+
+    if not dst_path.exists():
+        return None
+
+    with open(dst_path, "r") as f:
+        j = json.load(f)
+
+        return (j["acc_start"], j["acc_end"], j["robot_start"], j["robot_end"])
