@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from stdatalog_core.HSD.HSDatalog import HSDatalog
-from stdatalog_utils import prepare_folder
+from stdatalog_utils import prepare_folder, get_acc_data, get_gyro_data
 
 from pathlib import Path
 import shutil
@@ -24,48 +24,43 @@ def preview_datalog(path: str):
     dat_files = hsd.get_dat_file_list(hsd_instance)
     print(f".dat Files: {dat_files}\n")
 
-    components = hsd.get_all_components(hsd_instance)
-    for comp in components:
-        print(comp.keys())
+    acc_t, acc_data = get_acc_data(path, debug=True)
+    gyro_t, gyro_data = get_gyro_data(path, debug=True)
 
-    df_a = hsd.get_dataframe(hsd_instance, components[0])[0]
-    acc_data = df_a.to_numpy()
-
-    df_g = hsd.get_dataframe(hsd_instance, components[1])[0]
-    gyro_data = df_g.to_numpy()
+    gyro_data = np.rad2deg(gyro_data)  # Convert to deg/s for display
 
     plt.figure()
-    plt.plot(acc_data[:, 0], acc_data[:, 1:])
+    plt.plot(acc_t, acc_data)
     plt.xlabel("Time [s]")
     plt.ylabel("Acceleration [g]")
     plt.legend(["X", "Y", "Z"])
     plt.grid()
 
-    acc_data[:, 1:] = acc_data[:, 1:] - np.mean(acc_data[:, 1:], axis=0)
+    acc_data = acc_data - np.mean(acc_data, axis=0)
     plt.figure()
     plt.subplot(2, 1, 1)
-    plt.plot(acc_data[:, 0], acc_data[:, 1:])
+    plt.plot(acc_t, acc_data)
     plt.xlabel("Time [s]")
     plt.ylabel("Acceleration (AC) [g]")
     plt.legend(["X", "Y", "Z"])
     plt.grid()
 
     plt.subplot(2, 1, 2)
-    plt.plot(acc_data[:, 0], np.linalg.norm(acc_data[:, 1:], axis=1))
+    plt.plot(acc_t, np.linalg.norm(acc_data, axis=1))
     plt.xlabel("Time [s]")
     plt.ylabel("Acceleration Norm [g]")
     plt.grid()
 
-    acc_v_int = sp.integrate.cumulative_simpson(acc_data[:, 1:] * 9.81, x=acc_data[:, 0], axis=0)
+    acc_v_int = sp.integrate.cumulative_simpson(acc_data * 9.81, x=acc_t, axis=0)
     plt.figure()
-    plt.plot(acc_data[1:, 0], acc_v_int)
+    plt.plot(acc_t[1:], acc_v_int)
     plt.xlabel("Time [s]")
     plt.ylabel("Velocity integrated [m/s]")
     plt.legend(["X", "Y", "Z"])
     plt.grid()
 
     plt.figure()
-    plt.plot(gyro_data[:, 0], gyro_data[:, 1:])
+    plt.plot(gyro_t, gyro_data)
     plt.xlabel("Time [s]")
     plt.ylabel("Angular Velocity [deg/s]")
     plt.legend(["X", "Y", "Z"])

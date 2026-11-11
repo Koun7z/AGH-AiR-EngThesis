@@ -78,14 +78,15 @@ def get_gyro_data(path: str, debug: bool = False) -> tuple[np.ndarray, np.ndarra
         for comp in components:
             print(comp.keys())
 
-    df_a = hsd.get_dataframe(hsd_instance, components[1])[0]
+    df_gyro = hsd.get_dataframe(hsd_instance, components[1])[0]
     if (debug):
-        print(df_a.describe())
+        print(df_gyro.describe())
 
-    acc_data = df_a.to_numpy()
-    acc_t = acc_data[:, 0] - acc_data[0, 0]  # Normalize time to start at 0
+    gyro_data = df_gyro.to_numpy()
+    gyro_t = gyro_data[:, 0] - gyro_data[0, 0]  # Normalize time to start at 0
+    gyro_data = np.deg2rad(gyro_data / 1000.0)  # Convert mdeg to rad
 
-    return (acc_t, acc_data[:, 1:])
+    return (gyro_t, gyro_data[:, 1:])
 
 
 def get_ref_xyz_data(path: str, debug: bool = False) -> tuple[np.ndarray, np.ndarray]:
