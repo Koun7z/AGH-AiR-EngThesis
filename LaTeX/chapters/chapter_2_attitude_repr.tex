@@ -89,19 +89,19 @@ Given two quaternions $\boldsymbol{p}$ and $\boldsymbol{q}$, the cosine of the a
 \end{equation}
 Rotation quaternions can be interpolated using spherical linear interpolation (SLERP):
 \begin{equation}
-	\textit{SLERP}(\boldsymbol{q},\boldsymbol{p}, \alpha) =  \frac{\sin(\alpha\Omega)}{\sin(\Omega)}\boldsymbol{p} + \frac{\sin([1-\alpha]\Omega)}{\sin(\Omega)}\boldsymbol{q}, \alpha \in [0, 1]
+	\text{SLERP}(\boldsymbol{q},\boldsymbol{p}, \alpha) =  \frac{\sin(\alpha\Omega)}{\sin(\Omega)}\boldsymbol{p} + \frac{\sin([1-\alpha]\Omega)}{\sin(\Omega)}\boldsymbol{q}, \alpha \in [0, 1]
 \end{equation}
 This interpolation can also be approximated with a simple linear interpolation (LERP), reducing the computational cost at the cost of the accuracy and loss of the unit norm.
 \begin{equation}
-	\textit{LERP}(\boldsymbol{q},\boldsymbol{p}, \alpha) =  (1-\alpha)\boldsymbol{q} + \alpha\boldsymbol{p}, \alpha \in [0, 1]
+	\text{LERP}(\boldsymbol{q},\boldsymbol{p}, \alpha) =  (1-\alpha)\boldsymbol{q} + \alpha\boldsymbol{p}, \alpha \in [0, 1]
 \end{equation}
 
 To perform any mathematical operation between a vector and a quaternion, it is common practice to first convert the vector into a pure quaternion $\boldsymbol{p}$, i.e., a quaternion with a zero scalar part. The transformed vector can be later extracted from the pure quaternion by taking its vector part.
 \begin{equation}
-	{}^{B}\boldsymbol{p} = \begin{bmatrix} 0 \\ {}^{B}\mathbf{v} \end{bmatrix}
+	{}^{B}\boldsymbol{p} = \begin{bmatrix} 0 \\ {}^{B}\boldsymbol{v} \end{bmatrix}
 	\label{eq:qt:vec}
 \end{equation}
-To perform a rotation of a vector ${}^{B}\mathbf{v}$ from frame B to frame A, the following operation can be performed:
+To perform a rotation of a vector ${}^{B}\boldsymbol{v}$ from frame B to frame A, the following operation can be performed:
 \begin{equation}
 	{}^{A}\boldsymbol{p} = {}^{B}_{A}\boldsymbol
 	{q} \otimes {}^{B}\boldsymbol{p} \otimes {}^{B}_{A}\boldsymbol{q}^*

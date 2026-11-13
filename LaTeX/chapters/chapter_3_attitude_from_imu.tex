@@ -7,16 +7,16 @@ Neither of those two sensors can be used alone to provide a reliable attitude ob
 The measurement model for accelerometer observations $a_y$ can be represented as:
 
 \begin{equation}
-	\mathbf{a}_y = {}^{W}_{B}\mathbf{R}(\boldsymbol{\dot{v}} + \mathbf{g}) + \mathbf{b}_a + \boldsymbol{\mu}_a
+	\boldsymbol{a}_y = {}^{W}_{B}\boldsymbol{R}(\boldsymbol{\dot{v}} + \boldsymbol{g}) + \boldsymbol{b}_a + \boldsymbol{\mu}_a
 	\label{eq:y_acc}
 \end{equation}
 
 Where:
 \begin{eqwhere}[3cm]
-	\item[${}^{W}_{B}\mathbf{R}$] Rotations matrix representing transformation from world to body frame
-	\item[$\mathbf{g}$] Gravity vector in word frame
-	\item[$\mathbf{\dot{v}}$] Body frame acceleration
-	\item[${}\mathbf{b}_a$] Bias of the accelerometer
+	\item[${}^{W}_{B}\boldsymbol{R}$] Rotations matrix representing transformation from world to body frame
+	\item[$\boldsymbol{g}$] Gravity vector in word frame
+	\item[$\boldsymbol{\dot{v}}$] Body frame acceleration
+	\item[${}\boldsymbol{b}_a$] Bias of the accelerometer
 	\item[${}\boldsymbol{\mu}_a$] Measurement noise, including all unmodeled dynamics of the system
 \end{eqwhere}
 
@@ -30,7 +30,7 @@ Gyroscope measurements $\Omega_y$ can be represented as:
 
 \begin{equation}
 	\begin{aligned}
-		\boldsymbol{\omega}_y & = {}^B\boldsymbol{\omega} + \mathbf{b}_g + \boldsymbol{\mu}_g \\
+		\boldsymbol{\omega}_y & = {}^B\boldsymbol{\omega} + \boldsymbol{b}_g + \boldsymbol{\mu}_g \\
 		\boldsymbol{\omega}_y & = \left[\omega_{x}, \omega_{y}, \omega_{z}\right]^T           \\
 	\end{aligned}
 	\label{eq:y_gyro}
@@ -39,7 +39,7 @@ Gyroscope measurements $\Omega_y$ can be represented as:
 Where:
 \begin{eqwhere}[3cm]
 	\item[${}^B\boldsymbol{\omega}$] Real angular velocity vector in the sensor frame
-	\item[${}\mathbf{b}_g$] Gyroscope bias, slowly varying over time
+	\item[${}\boldsymbol{b}_g$] Gyroscope bias, slowly varying over time
 	\item[${}\boldsymbol{\mu}_g$] Measurement noise, including all unmodeled dynamics of the system
 \end{eqwhere}
 
